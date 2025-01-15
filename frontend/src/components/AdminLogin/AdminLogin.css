@@ -1,0 +1,127 @@
+/* components/AdminLogin/AdminLogin.css */
+.admin-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #8B7355;
+    padding: 20px;
+}
+
+.admin-login-card {
+    background-color: #F5F5DC;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.admin-login-logo {
+    margin-bottom: 20px;
+}
+
+.admin-login-logo img {
+    width: 80px;
+    height: auto;
+}
+
+.admin-login-card h2 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.code-inputs input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 20px;
+    border: 2px solid #8B7355;
+    border-radius: 5px;
+    background: white;
+}
+
+.code-inputs input:focus {
+    outline: none;
+    border-color: #6B5B45;
+}
+
+.login-button {
+    background-color: #8B7355;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #6B5B45;
+}
+
+.login-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+
+.admin-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.admin-login-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.admin-login-logo img {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+.code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.code-inputs input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.login-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}

@@ -1,0 +1,51 @@
+/* App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #7617b6;
+}
+
+.home-container, .booking-container, .slots-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn:hover {
+  background-color: #555;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.slot {
+  padding: 10px;
+  background-color: #ccc;
+  border-radius: 5px;
+}
+
+.slot.available {
+  background-color: green;
+  color: white;
+}
+
+.slot.unavailable {
+  background-color: red;
+  color: white;
+}
+
+

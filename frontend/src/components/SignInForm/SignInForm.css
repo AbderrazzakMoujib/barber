@@ -1,0 +1,91 @@
+body {
+    background-color: #000; 
+    color: #fff; 
+    font-family: Arial, sans-serif;
+}
+
+.signin-container {
+    width: 300px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: rgb(97 23 182);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    text-align: center;
+}
+
+.logo5 {
+    margin-bottom: 20px;
+}
+
+.logo-img3 {
+    max-width: 5rem;
+    margin-bottom: 1rem;
+}
+
+.signin-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.signin-form label {
+    margin-bottom: 5px;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: left;
+  }
+
+.signin-form input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5rem;
+    font-size: 16px;
+}
+
+.signin-form button {
+    padding: 10px;
+    background-color: #16a34a; /* Brown button */
+    color: white;
+    border: none;
+    border-radius: 5rem;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.signin-form button:hover {
+    background-color: #209930; /* Lighter brown on hover */
+}
+
+.login-text {
+    margin-top: 15px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.login-text a {
+    color: #2da03c;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    .signin-container {
+        margin: 50px auto; /* Reduce margin on smaller screens */
+        padding: 15px; /* Adjust padding */
+    }
+
+    .signin-form input {
+        font-size: 14px; /* Smaller font size for inputs */
+    }
+
+    .signin-form button {
+        font-size: 14px; /* Smaller font size for button */
+    }
+
+    .login-text {
+        font-size: 12px; /* Smaller font size for text */
+    }
+}

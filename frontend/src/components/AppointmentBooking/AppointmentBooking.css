@@ -1,0 +1,313 @@
+/* Main container styling */
+.booking-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    padding: 20px;
+    font-family: "Roboto", sans-serif;
+    color: #333; /* Text color */
+}
+
+/* User icon design */
+.user-icon {
+    background-color: #4b5563; /* Dark gray */
+    color: white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Booking content container */
+.booking-content {
+    background-color: white; /* Card background */
+    border-radius: 15px;
+    padding: 40px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers child elements horizontally */
+}
+
+/* Heading design */
+.booking-content h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #2c3e50; /* Slightly darker text for emphasis */
+}
+
+/* Chair icon styling */
+.chair-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Centers the image vertically */
+    margin: 20px 0; /* Centered margin around the image */
+}
+
+.chair-icon img {
+    width: 120px; /* Slightly larger image for better visibility */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px; /* Optional: rounded corners for style */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Button group */
+.inputs button {
+    background-color: #6b705c; /* Soft green-brown */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inputs button:hover {
+    background-color: #556052; /* Darker shade */
+}
+
+/* Paragraph text styling */
+.booking-content p {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.6; /* Improve readability */
+    color: #444; /* Slightly darker text for contrast */
+    text-align: center; /* Center-align all paragraphs */
+}
+
+.booking-content p span {
+    color: #e63946; /* Highlighted warning span */
+    font-weight: bold;
+}
+
+.booking-content p.strong {
+    font-weight: bold;
+    color: #2c3e50; /* Bold and emphasized text for key information */
+}
+
+/* Warning text */
+.warning {
+    color: #e63946; /* Bold red for warning */
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.warning span {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #ff6b6b; /* Slightly lighter red */
+}
+
+/* Confirm button */
+.confirm-btn {
+    background-color: #2a9d8f; /* Calming teal */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.confirm-btn:hover {
+    background-color: #21867a; /* Slightly darker teal */
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+   /* Annuler button styling */
+   .cancel-button {
+    background-color: #e63946; /* Red for cancel action */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cancel-button:hover {
+    background-color: #d62839; /* Slightly darker red on hover */
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+.cancel-button:active {
+    background-color: #c71d32; /* Darker shade for active state */
+    transform: scale(0.95); /* Slight shrink effect */
+}
+
+
+.legend-items {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .legend-items img {
+    width: 7rem;
+    height: auto;
+  }
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .booking-content {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .inputs button {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .confirm-btn {
+        font-size: 16px;
+    }
+}
+/* Main container styling */
+.booking-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    padding: 20px;
+    font-family: "Roboto", sans-serif;
+    color: #333; /* Text color */
+}
+
+/* Top bar styling */
+.reservation-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Avatar styling */
+.user-circle {
+margin-bottom: 1rem;
+margin-right: auto;
+}
+
+.grop_logo{
+    width: 60px;
+    height: auto;
+}
+
+.grop_logo_avatar{
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar-initial {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Logo styling */
+.reservation-logo {
+    width: 60px;
+    height: auto;
+}
+
+/* Booking content container */
+.booking-content {
+    background-color: white;
+    border-radius: 15px;
+    padding: 40px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Chair icon styling */
+.chair-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.chair-icon img {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Button group */
+.inputs button {
+    background-color: #6b705c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inputs button:hover {
+    background-color: #556052;
+}
+
+/* Confirmation button */
+.confirm-btn {
+    background-color: #2a9d8f;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 1rem;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.confirm-btn:hover {
+    background-color: #21867a;
+    transform: scale(1.05);
+}
+
+/* Warning text */
+.warning {
+    color: #e63946;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.warning span {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #ff6b6b;
+}

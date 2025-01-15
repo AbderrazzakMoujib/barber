@@ -1,0 +1,33 @@
+/* Center the content in the page */
+.landing-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #7617b6; /* Black background */
+}
+
+/* Style the logo image */
+.logo {
+  max-width: 90%; /* Limite la largeur à 90% de l'écran */
+  height: auto; /* Maintient le ratio d'aspect */
+  animation: spin 4s linear infinite; /* Appliquer l'animation */
+}
+
+/* Définition de l'animation de rotation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg); /* Début de la rotation */
+  }
+  to {
+    transform: rotate(360deg); /* Fin de la rotation */
+  }
+}
+
+/* Styles spécifiques pour les appareils mobiles */
+@media (max-width: 600px) {
+  .logo {
+    margin-left: 3rem;
+    max-width: 70%; /* Réduire la largeur maximale à 70% sur mobile */
+  }
+}

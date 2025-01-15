@@ -1,0 +1,175 @@
+body {
+  margin: 0;
+  padding: 0;
+  /* min-height: 100vh; */
+  font-family: Arial, sans-serif;
+}
+
+/* Admin Login Styles */
+.admin-login {
+  height: 100vh;
+  background-color: rgb(107, 84, 70);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.admin-logo img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+.admin-form-container {
+  background-color: rgb(227, 220, 202);
+  padding: 25px;
+  border-radius: 10px;
+  width: 280px;
+}
+
+.admin-form-container h2 {
+  color: #000;
+  text-align: center;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+}
+
+.admin-form-container p {
+  color: #000;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.admin-form-container input {
+  width: calc(100% - 20px);
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  letter-spacing: 8px;
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.admin-login-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: rgb(107, 84, 70);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* User Login Styles */
+.login-container {
+  width: 90%;
+  max-width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: rgb(97 23 182);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.logo4 {
+  margin-bottom: 20px;
+}
+
+.logo-img4 {
+  max-width: 80px;
+  margin-bottom: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  margin-bottom: 5px;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: left;
+}
+
+.login-form input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  font-size: 14px;
+}
+
+.login-form button {
+  padding: 10px;
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-form button:hover {
+  background-color: #2da03c;
+}
+
+.signup-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.signup-text a {
+  color: #dc2626;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.switch-mode {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: rgba(107, 84, 70, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Add this to your existing LoginForm.css */
+.admin-button {
+  margin-top: 5rem;
+  margin-left: 78rem;
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 5rem;
+}
+
+.admin-button:hover {
+  background-color: #209930;
+}
+
+@media screen and (min-width: 768px) {
+  .login-container {
+      width: 60%;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .login-container {
+      width: 40%;
+      max-width: 400px;
+  }
+}
