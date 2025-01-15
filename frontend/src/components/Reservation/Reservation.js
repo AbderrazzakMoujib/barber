@@ -4,7 +4,8 @@ import { format } from "date-fns";
 import { toast } from "react-toastify";
 import axios from "../../fetch/fetch";
 import { Context } from "../../Context/Context";
-import AvatarDropdown from "../AvatarDropdown/AvatarDropdown"; // Import du composant
+import AvatarDropdown from "../AvatarDropdown/AvatarDropdown";
+import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
 import "./Reservation.css";
 
 const TimeSlot = ({ slot, isReserved, reservedUser, onClick }) => (
@@ -28,11 +29,13 @@ const TimeSlot = ({ slot, isReserved, reservedUser, onClick }) => (
 );
 
 const Reservation = () => {
-  const { user, setUser } = useContext(Context);
+  const { user, setUser, admin } = useContext(Context);
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+  const isAdmin = Boolean(admin);
+  const adminName = admin?.name || location.state?.adminName || 'Admin';
 
   const [currentDate, setCurrentDate] = useState(() =>
     location.state?.selectedDate ? new Date(location.state.selectedDate) : new Date()
@@ -112,24 +115,24 @@ const Reservation = () => {
     <div className="reservation-jiniral">
       <div className="reservation-top-bar">
         <div className="grop_avatar_rotor">
-        <div className="back-button" onClick={handleBackClick}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </div>
-        <div className="user-circles">
-        <AvatarDropdown /> 
-        </div>
+          <div className="back-button" onClick={handleBackClick}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </div>
+          <div className="user-circles">
+            {isAdmin ? <AdminAvatarDropdown initialName={adminName}/> : <AvatarDropdown />}
+          </div>
         </div>
         <img src="logo.png" alt="Logo" className="reservation-logo" />
       </div>
