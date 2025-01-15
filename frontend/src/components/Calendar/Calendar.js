@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   startOfMonth,
   endOfMonth,
@@ -19,13 +19,24 @@ import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
 import "./Calendar.css";
 
 const Calendar = () => {
-  const { user } = useContext(Context);
+  const { user, admin } = useContext(Context);
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [workingDays, setWorkingDays] = useState([]);
   const [pastReservations, setPastReservations] = useState([]);
   const [reservationDays, setReservationDays] = useState({});
-  const isAdmin = user?.isAdmin || false;
+  const location = useLocation();
+  const { setAdmin } = useContext(Context);
+  const adminName = admin?.name || location.state?.adminName || 'Admin';
+  const isAdmin = Boolean(admin);
+
+  useEffect(() => {
+    // Check if admin data exists in localStorage on component mount
+    const storedAdmin = localStorage.getItem('admin');
+    if (storedAdmin && !admin) {
+        setAdmin(JSON.parse(storedAdmin));
+    }
+  }, [admin, setAdmin]);
 
   useEffect(() => {
     const fetchWorkingDaysAndReservations = async () => {
@@ -133,9 +144,9 @@ const Calendar = () => {
   return (
     <div className="calendar-screen">
       <div className="calendar-top-bar">
-      <div className="user-circles">
-      {isAdmin ? <AdminAvatarDropdown/> : <AvatarDropdown />}
-    </div>
+        <div className="user-circles">
+          {isAdmin ? <AdminAvatarDropdown initialName={adminName}/> : <AvatarDropdown />}
+        </div>
         <img src="logo.png" alt="Logo" className="calendar-logo" />
       </div>
       <div className="calendar-container">
