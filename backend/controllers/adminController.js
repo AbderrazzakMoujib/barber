@@ -2,8 +2,23 @@ import Admin from '../models/Admin.js';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
 
+// Utility function to validate adminCode length
+const validateAdminCode = (code) => {
+  if (code.length !== 5) {
+    throw new Error('Admin code must be exactly 5 characters');
+  }
+};
+
+// @desc    Admin login
+// @route   POST /api/admin/login
+// @access  Public
 export const loginAdmin = asyncHandler(async (req, res) => {
   const { code } = req.body;
+
+  if (!code) {
+    res.status(400);
+    throw new Error('Admin code is required');
+  }
 
   const admin = await Admin.findOne({ isActive: true });
 
@@ -16,11 +31,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   await admin.save();
 
   const token = jwt.sign(
-    { 
-      id: admin._id,
-      name: admin.name,
-      role: admin.role
-    },
+    { id: admin._id, name: admin.name, role: admin.role },
     process.env.JWT_SECRET,
     { expiresIn: '30d' }
   );
@@ -29,34 +40,21 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'Strict',
-    maxAge: 30 * 24 * 60 * 60 * 1000
+    maxAge: 30 * 24 * 60 * 60 * 1000  // 30 days
   });
 
-  const responseData = {
+  res.status(200).json({
     _id: admin._id,
     name: admin.name,
     role: admin.role,
-    isActive: admin.isActive,
     lastLogin: admin.lastLogin,
-    isAdmin: true,
     token
-  };
-
-  res.status(200).json(responseData);
-});
-
-export const logoutAdmin = asyncHandler(async (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    expires: new Date(0),
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Strict',
-    path: '/',
   });
-
-  res.status(200).json({ message: 'Logged out successfully' });
 });
 
+// @desc    Get admin profile
+// @route   GET /api/admin/me
+// @access  Private (Admin only)
 export const getAdminProfile = asyncHandler(async (req, res) => {
   const admin = await Admin.findById(req.admin._id).select('-adminCode');
   
@@ -74,6 +72,9 @@ export const getAdminProfile = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Update admin profile
+// @route   PUT /api/admin/profile
+// @access  Private (Admin only)
 export const updateAdminProfile = asyncHandler(async (req, res) => {
   const admin = await Admin.findById(req.admin._id);
 
@@ -83,13 +84,11 @@ export const updateAdminProfile = asyncHandler(async (req, res) => {
   }
 
   admin.name = req.body.name || admin.name;
-  
+
   if (req.body.adminCode) {
-    if (req.body.adminCode.length !== 5) {
-      res.status(400);
-      throw new Error('Admin code must be exactly 5 characters');
-    }
-    admin.adminCode = req.body.adminCode;
+    validateAdminCode(req.body.adminCode); // Use helper function for validation
+    const salt = await bcrypt.genSalt(10);
+    admin.adminCode = await bcrypt.hash(req.body.adminCode, salt);  // Hash the new code
   }
 
   const updatedAdmin = await admin.save();
@@ -103,6 +102,9 @@ export const updateAdminProfile = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Create a new admin
+// @route   POST /api/admin/create
+// @access  Private (Admin only)
 export const createAdmin = asyncHandler(async (req, res) => {
   const { name, adminCode } = req.body;
 
@@ -111,10 +113,7 @@ export const createAdmin = asyncHandler(async (req, res) => {
     throw new Error('Please provide both name and admin code');
   }
 
-  if (adminCode.length !== 5) {
-    res.status(400);
-    throw new Error('Admin code must be exactly 5 characters');
-  }
+  validateAdminCode(adminCode); // Validate adminCode length
 
   const adminExists = await Admin.findOne({ adminCode });
   if (adminExists) {
@@ -135,7 +134,22 @@ export const createAdmin = asyncHandler(async (req, res) => {
       isActive: admin.isActive
     });
   } else {
-    res.status(400);
-    throw new Error('Invalid admin data');
+    res.status(500);
+    throw new Error('Failed to create admin');
   }
+});
+
+// @desc    Admin logout
+// @route   POST /api/admin/logout
+// @access  Public
+export const logoutAdmin = asyncHandler(async (req, res) => {
+  res.cookie('token', '', {
+    httpOnly: true,
+    expires: new Date(0),
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    path: '/',
+  });
+
+  res.status(200).json({ message: 'Logged out successfully' });
 });

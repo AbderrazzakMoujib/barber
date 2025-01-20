@@ -1,4 +1,3 @@
-// reservationController.js
 import Reservation from '../models/Reservation.js';
 
 export const makeReservation = async (req, res) => {
@@ -17,10 +16,10 @@ export const makeReservation = async (req, res) => {
       }
     });
 
-    const totalSlots = 21; // Same as availableSlots length
+    const totalSlots = 21;
     if (dayReservations.length >= totalSlots) {
       return res.status(400).json({ 
-        message: 'All slots are full for this day. Please select another day.'
+        message: 'All slots are full for this day. Please select another day.' 
       });
     }
 
@@ -58,6 +57,10 @@ export const getWorkingDays = async (req, res) => {
   try {
     const { month, year } = req.query;
 
+    if (!month || !year) {
+      return res.status(400).json({ message: 'Month and year are required' });
+    }
+
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
@@ -66,7 +69,7 @@ export const getWorkingDays = async (req, res) => {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
-      if (date.getDay() !== 2 && day !== 0) { // Not Tuesday and not Sunday
+      if (date.getDay() !== 2) { // Only Tuesday (2) is a rest day
         workingDays.push(day);
       }
     }
@@ -82,14 +85,19 @@ export const getPastReservations = async (req, res) => {
   try {
     const { month, year } = req.query;
 
+    if (!month || !year) {
+      return res.status(400).json({ message: 'Month and year are required' });
+    }
+
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
+    const currentDate = new Date();
 
     const pastReservations = await Reservation.find({
       date: {
         $gte: startDate,
         $lte: endDate,
-        $lt: new Date()
+        $lt: currentDate
       }
     });
 
@@ -104,13 +112,24 @@ export const getPastReservations = async (req, res) => {
 
 export const getAllReservations = async (req, res) => {
   try {
-    const { date } = req.query;
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+      return res.status(400).json({ 
+        message: 'Month and year are required' 
+      });
+    }
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+
     const reservations = await Reservation.find({
       date: {
-        $gte: new Date(date + 'T00:00:00.000Z'),
-        $lt: new Date(date + 'T23:59:59.999Z')
+        $gte: startDate,
+        $lte: endDate
       }
     }).populate('user', 'firstName name');
+
     return res.status(200).json(reservations);
   } catch (error) {
     console.error('Error fetching all reservations:', error);
@@ -121,8 +140,11 @@ export const getAllReservations = async (req, res) => {
 export const checkDayAvailability = async (req, res) => {
   try {
     const { date } = req.query;
-    
-    // Get all reservations for the specified date
+
+    if (!date) {
+      return res.status(400).json({ message: 'Date is required' });
+    }
+
     const reservations = await Reservation.find({
       date: {
         $gte: new Date(date + 'T00:00:00.000Z'),
@@ -130,7 +152,7 @@ export const checkDayAvailability = async (req, res) => {
       }
     });
 
-    const totalSlots = 21; // Based on availableSlots array length
+    const totalSlots = 21;
     const hasAvailability = reservations.length < totalSlots;
 
     res.json({ 
@@ -149,18 +171,21 @@ export const deleteReservation = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id) {
+      return res.status(400).json({ message: 'Reservation ID is required' });
+    }
+
     const reservation = await Reservation.findById(id);
 
     if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
 
-    // Check if the reservation belongs to the logged-in user
     if (reservation.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this reservation' });
     }
 
-    await reservation.remove();
+    await Reservation.findByIdAndDelete(id);
     return res.status(200).json({ message: 'Reservation deleted successfully' });
   } catch (error) {
     console.error('Error deleting reservation:', error);
@@ -173,22 +198,25 @@ export const updateReservation = async (req, res) => {
     const { id } = req.params;
     const { timeSlot, partySize } = req.body;
 
+    if (!id) {
+      return res.status(400).json({ message: 'Reservation ID is required' });
+    }
+
     const reservation = await Reservation.findById(id);
 
     if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
 
-    // Check if the reservation belongs to the logged-in user
     if (reservation.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to update this reservation' });
     }
 
-    // Check if the new time slot is already taken
     if (timeSlot && timeSlot !== reservation.timeSlot) {
       const existingReservation = await Reservation.findOne({
         date: reservation.date,
-        timeSlot: timeSlot
+        timeSlot: timeSlot,
+        _id: { $ne: id }
       });
 
       if (existingReservation) {
@@ -196,7 +224,6 @@ export const updateReservation = async (req, res) => {
       }
     }
 
-    // Update the reservation
     reservation.timeSlot = timeSlot || reservation.timeSlot;
     reservation.partySize = partySize || reservation.partySize;
     
@@ -206,15 +233,4 @@ export const updateReservation = async (req, res) => {
     console.error('Error updating reservation:', error);
     return res.status(500).json({ message: 'Error updating reservation' });
   }
-};
-
-export default {
-  makeReservation,
-  getUserReservations,
-  getWorkingDays,
-  getPastReservations,
-  getAllReservations,
-  checkDayAvailability,
-  deleteReservation,
-  updateReservation
 };

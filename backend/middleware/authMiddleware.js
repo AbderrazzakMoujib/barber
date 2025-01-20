@@ -1,65 +1,85 @@
 import jwt from 'jsonwebtoken';
+import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
 import Admin from '../models/Admin.js';
-import asyncHandler from 'express-async-handler';
 
-const protect = asyncHandler(async (req, res, next) => {
-  let token = req.cookies.token;
-
-  if (!token) {
-    res.status(401);
-    throw new Error('Not authorized');
-  }
-
+// Function to verify the token and return either a user or an admin
+const verifyTokenAndGetUserOrAdmin = async (token) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const user = await User.findById(decoded.id).select('-password');
+
+    let user = await User.findById(decoded.id).select('-password');
     if (user) {
-      req.user = user;
-      next();
-      return;
+      return { user };
     }
-    
-    const admin = await Admin.findById(decoded.id).select('-adminCode');
+
+    let admin = await Admin.findById(decoded.id).select('-adminCode');
     if (admin) {
-      req.admin = admin;
-      next();
-      return;
+      return { admin, isAdmin: true };
     }
 
-    throw new Error('Not authorized');
+    return null;
   } catch (error) {
-    res.clearCookie('token');
-    res.status(401);
-    throw new Error('Not authorized');
+    console.error("Error in token verification:", error);
+    return null;
   }
-});
+};
 
-export const protectAdmin = asyncHandler(async (req, res, next) => {
-  let token = req.cookies.token;
+// Middleware to protect routes
+const protect = asyncHandler(async (req, res, next) => {
+  const token = req.cookies?.token;
 
   if (!token) {
-    res.status(401);
-    throw new Error('Not authorized');
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Admin.findById(decoded.id).select('-adminCode');
+  const userOrAdmin = await verifyTokenAndGetUserOrAdmin(token);
 
-    if (!admin) {
-      res.status(401);
-      throw new Error('Not authorized as admin');
+  if (userOrAdmin) {
+    if (userOrAdmin.user) {
+      req.user = userOrAdmin.user;
     }
-
-    req.admin = admin;
-    next();
-  } catch (error) {
-    res.clearCookie('token');
-    res.status(401);
-    throw new Error('Not authorized');
+    if (userOrAdmin.admin) {
+      req.admin = userOrAdmin.admin;
+      req.isAdmin = userOrAdmin.isAdmin;
+    }
+    return next();
   }
+
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    path: '/',
+  });
+
+  return res.status(401).json({ message: 'Not authorized, token failed' });
 });
 
-export default protect;
+// Middleware to protect routes for admins only
+const protectAdmin = asyncHandler(async (req, res, next) => {
+  const token = req.cookies?.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+
+  const userOrAdmin = await verifyTokenAndGetUserOrAdmin(token);
+
+  if (userOrAdmin && userOrAdmin.admin) {
+    req.admin = userOrAdmin.admin;
+    req.isAdmin = true;
+    return next();
+  }
+
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict',
+    path: '/',
+  });
+
+  return res.status(401).json({ message: 'Not authorized as admin' });
+});
+
+export { protect, protectAdmin };

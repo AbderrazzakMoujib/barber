@@ -1,4 +1,4 @@
-// AvatarDropdown.js
+// src/components/AvatarDropdown/AvatarDropdown.js
 import React, { useContext, useState } from "react";
 import { Context } from "../../Context/Context";
 import axiosInstance from "../../fetch/fetch";
@@ -6,93 +6,96 @@ import { useNavigate } from "react-router-dom";
 import "./AvatarDropdown.css";
 
 const AvatarDropdown = () => {
-  const { avatar, setAvatar, user, setUser } = useContext(Context);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+    const { avatar, setAvatar, user, setUser } = useContext(Context);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const navigate = useNavigate();
 
-  const getInitial = () => {
-    if (user && user.name) {
-      return user.name.charAt(0).toUpperCase();
-    }
-    return '?';
-  };
+    const getInitial = () => {
+        if (user?.name) {
+            return user.name.charAt(0).toUpperCase();
+        }
+        return '?';
+    };
 
-  const handleLogout = async () => {
-    try {
-      await axiosInstance.post('/api/users/logout');
-      setUser(null);
-      setAvatar(null);
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/login';
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+    const handleLogout = async () => {
+        try {
+            await axiosInstance.post('/api/users/logout');
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            setUser(null);
+            setAvatar(null);
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login';
+        }
+    };
 
-  const handleOptionClick = async (option) => {
-    if (option === "logout") {
-      await handleLogout();
-    } else if (option === "profile") {
-      console.log("Navigate to profile");
-    }
-    setIsDropdownOpen(false);
-  };
+    const handleAvatarChange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append('avatar', file);
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatar(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+            try {
+                const response = await axiosInstance.post('/api/users/avatar', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                setAvatar(response.data.avatarUrl);
+            } catch (error) {
+                console.error("Avatar upload failed:", error);
+            }
+        }
+    };
 
-  return (
-    <div className="avatar-container">
-      <div
-        className="avatar-wrapper"
-        onClick={() => user && setIsDropdownOpen(!isDropdownOpen)}
-      >
-        {avatar ? (
-          <img src={avatar} alt="Avatar" className="avatar-image" />
-        ) : (
-          <div className="avatar-placeholder" style={{ fontSize: '24px', fontWeight: 'bold' }}>
-            {getInitial()}
-          </div>
-        )}
-      </div>
+    return (
+        <div className="avatar-container">
+            <div
+                className="avatar-wrapper"
+                onClick={() => user && setIsDropdownOpen(!isDropdownOpen)}
+            >
+                {avatar ? (
+                    <img src={avatar} alt="Avatar" className="avatar-image" />
+                ) : (
+                    <div className="avatar-placeholder">
+                        {getInitial()}
+                    </div>
+                )}
+            </div>
 
-      {isDropdownOpen && user && (
-        <div className="dropdown-menu">
-          <label htmlFor="avatar-upload" className="dropdown-item">
-            <i className="fas fa-image"></i> Changer l'avatar
-          </label>
-          <input
-            type="file"
-            id="avatar-upload"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="avatar-input-hidden"
-          />
-          <button
-            className="dropdown-item"
-            onClick={() => handleOptionClick("profile")}
-          >
-            <i className="fas fa-user-circle"></i> Voir le profil
-          </button>
-          <button
-            className="dropdown-item"
-            onClick={() => handleOptionClick("logout")}
-          >
-            <i className="fas fa-sign-out-alt"></i> Se déconnecter
-          </button>
+            {isDropdownOpen && user && (
+                <div className="dropdown-menu">
+                    <label htmlFor="avatar-upload" className="dropdown-item">
+                        <i className="fas fa-image"></i> Changer l'avatar
+                    </label>
+                    <input
+                        type="file"
+                        id="avatar-upload"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="avatar-input-hidden"
+                    />
+                    <button
+                        className="dropdown-item"
+                        onClick={() => {
+                            setIsDropdownOpen(false);
+                            navigate('/profile');
+                        }}
+                    >
+                        <i className="fas fa-user-circle"></i> Voir le profil
+                    </button>
+                    <button
+                        className="dropdown-item"
+                        onClick={handleLogout}
+                    >
+                        <i className="fas fa-sign-out-alt"></i> Se déconnecter
+                    </button>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default AvatarDropdown;

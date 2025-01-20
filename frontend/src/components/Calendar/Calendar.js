@@ -25,57 +25,68 @@ const Calendar = () => {
   const [workingDays, setWorkingDays] = useState([]);
   const [pastReservations, setPastReservations] = useState([]);
   const [reservationDays, setReservationDays] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const location = useLocation();
-  const { setAdmin } = useContext(Context);
-  const adminName = admin?.name || location.state?.adminName || 'Admin';
   const isAdmin = Boolean(admin);
 
   useEffect(() => {
-    // Check if admin data exists in localStorage on component mount
-    const storedAdmin = localStorage.getItem('admin');
-    if (storedAdmin && !admin) {
-        setAdmin(JSON.parse(storedAdmin));
-    }
-  }, [admin, setAdmin]);
-
-  useEffect(() => {
     const fetchWorkingDaysAndReservations = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
+        // Fetch working days for the current month
         const workingDaysResponse = await axios.get("/api/reservations/working-days", {
           params: {
             month: format(currentDate, "MM"),
             year: format(currentDate, "yyyy"),
           },
         });
-        setWorkingDays(workingDaysResponse.data.workingDays);
+        
+        if (workingDaysResponse.data?.workingDays) {
+          setWorkingDays(workingDaysResponse.data.workingDays);
+        }
 
+        // For admin, fetch all reservations to show days with bookings
         if (isAdmin) {
           const response = await axios.get("/api/reservations/all", {
             params: {
-              date: format(currentDate, "yyyy-MM-dd"),
+              month: format(currentDate, "MM"),
+              year: format(currentDate, "yyyy"),
             },
           });
           
-          const reservationsMap = {};
-          response.data.forEach(reservation => {
-            const day = new Date(reservation.date).getDate();
-            reservationsMap[day] = true;
-          });
-          setReservationDays(reservationsMap);
+          if (response.data) {
+            // Create a map of days with reservations
+            const reservationsMap = {};
+            response.data.forEach(reservation => {
+              const day = new Date(reservation.date).getDate();
+              reservationsMap[day] = true;
+            });
+            setReservationDays(reservationsMap);
+          }
         }
 
+        // Fetch past reservations
         const pastReservationsResponse = await axios.get("/api/reservations/past-reservations", {
           params: {
             month: format(currentDate, "MM"),
             year: format(currentDate, "yyyy"),
           },
         });
-        setPastReservations(pastReservationsResponse.data.reservations);
         
-        toast.success("Calendar loaded successfully 📅");
+        if (pastReservationsResponse.data?.reservations) {
+          setPastReservations(pastReservationsResponse.data.reservations);
+        }
+        
+        toast.success("Calendrier chargé avec succès 📅");
       } catch (error) {
         console.error("Error loading data", error);
-        toast.error("Failed to load calendar data ❌");
+        setError(error.response?.data?.message || "Error loading calendar data");
+        toast.error("Échec du chargement du calendrier ❌");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -89,33 +100,34 @@ const Calendar = () => {
           date: format(date, "yyyy-MM-dd")
         }
       });
-      return response.data.hasAvailability;
+      return response.data?.hasAvailability ?? false;
     } catch (error) {
       console.error("Error checking day availability:", error);
-      toast.error("Error checking availability ❌");
+      toast.error("Erreur lors de la vérification de la disponibilité ❌");
       return false;
     }
   };
 
   const handleDayClick = async (date, status) => {
     if (status === "rest-day") {
-      toast.error("This day is not available for booking ⛔");
+      toast.error("Ce jour n'est pas disponible pour la réservation ⛔");
       return;
     }
 
     if (status === "past-day" || status === "past-with-reservation") {
-      toast.warning("Cannot book past dates ⚠️");
+      toast.warning("Impossible de réserver des dates passées ⚠️");
       return;
     }
 
     if (status === "working-day") {
-      const hasAvailability = await checkDayAvailability(date);
-      if (!hasAvailability) {
-        toast.warning("All time slots are full for this day. Please select another day. 📅");
-        return;
+      if (!isAdmin) {
+        const hasAvailability = await checkDayAvailability(date);
+        if (!hasAvailability) {
+          toast.warning("Tous les créneaux sont complets pour ce jour. Veuillez sélectionner un autre jour. 📅");
+          return;
+        }
       }
       
-      toast.success("Date selected successfully! 🎉");
       navigate("/reservation", {
         state: { selectedDate: format(date, "yyyy-MM-dd") },
       });
@@ -126,46 +138,76 @@ const Calendar = () => {
     const dayNumber = parseInt(format(date, "d"));
     const dayOfWeek = getDay(date);
 
+    // Tuesday is rest day
     if (dayOfWeek === 2) return "rest-day";
 
+    // Past days
     if (isPast(date) && !isToday(date)) {
       const hasReservations = pastReservations.includes(dayNumber);
       return hasReservations ? "past-with-reservation" : "past-day";
     }
 
-    if (dayNumber === 0) {
+    // Sunday is rest day
+    if (dayOfWeek === 0) {
       return "rest-day";
     }
 
+    // Check if it's a working day
     const isWorking = workingDays.includes(dayNumber);
     return isWorking ? "working-day" : "rest-day";
   };
+
+  if (isLoading) {
+    return <div className="loading">Loading calendar...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
     <div className="calendar-screen">
       <div className="calendar-top-bar">
         <div className="user-circles">
-          {isAdmin ? <AdminAvatarDropdown initialName={adminName}/> : <AvatarDropdown />}
+          {isAdmin ? <AdminAvatarDropdown /> : <AvatarDropdown />}
         </div>
-        <img src="logo.png" alt="Logo" className="calendar-logo" />
+        <img src="/logo.png" alt="Logo" className="calendar-logo" />
       </div>
+
       <div className="calendar-container">
         <div className="calendar-header">
-          <button onClick={() => setCurrentDate(subMonths(currentDate, 1))}>&lt;</button>
+          <button 
+            onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+            className="month-nav-button"
+          >
+            &lt;
+          </button>
           <h2>{format(currentDate, "MMMM yyyy")}</h2>
-          <button onClick={() => setCurrentDate(addMonths(currentDate, 1))}>&gt;</button>
+          <button 
+            onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+            className="month-nav-button"
+          >
+            &gt;
+          </button>
         </div>
+
         <div className="days">
-          {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
+          {["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"].map((day) => (
             <div key={day} className="day-name">
               {day}
             </div>
           ))}
         </div>
+
         <div className="weeks">
-          {Array.from({ length: getDay(startOfMonth(currentDate)) === 0 ? 6 : getDay(startOfMonth(currentDate)) - 1 }).map((_, index) => (
+          {Array.from({ 
+            length: getDay(startOfMonth(currentDate)) === 0 
+              ? 6 
+              : getDay(startOfMonth(currentDate)) - 1 
+          }).map((_, index) => (
             <div key={`empty-${index}`} className="day empty"></div>
           ))}
+
           {eachDayOfInterval({
             start: startOfMonth(currentDate),
             end: endOfMonth(currentDate),
@@ -177,7 +219,7 @@ const Calendar = () => {
             return (
               <div
                 key={date}
-                className={`day ${status}`}
+                className={`day ${status} ${hasReservations ? 'has-reservations' : ''}`}
                 onClick={() => handleDayClick(date, status)}
               >
                 {format(date, "d")}
@@ -188,15 +230,19 @@ const Calendar = () => {
             );
           })}
         </div>
+
         <div className="legend">
-          <div className="legend-items">
-            <span className="legend-color working-day"></span> Jour Travaillé
+          <div className="legend-item">
+            <span className="legend-color working-day"></span>
+            Jour Travaillé
           </div>
-          <div className="legend-items">
-            <span className="legend-color rest-day"></span> Jour de Repos
+          <div className="legend-item">
+            <span className="legend-color rest-day"></span>
+            Jour de Repos
           </div>
-          <div className="legend-items">
-            <span className="legend-color past-day"></span> Jour Passé
+          <div className="legend-item">
+            <span className="legend-color past-day"></span>
+            Jour Passé
           </div>
           {isAdmin && (
             <div className="legend-item">

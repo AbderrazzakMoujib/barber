@@ -8,7 +8,8 @@ import { fileURLToPath } from 'url';
 import connectDB from './db/connectDB.js';
 import userRoutes from './routes/userRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
-import adminRoutes from './routes/adminRoutes.js'; // Import des routes admin
+import adminRoutes from './routes/adminRoutes.js';
+import { errorHandler } from './middleware/errorMiddleware.js';
 
 dotenv.config();
 
@@ -17,37 +18,57 @@ const __dirname = path.dirname(__filename);
 
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/users', userRoutes);
 app.use('/api/reservations', reservationRoutes);
-app.use('/api/admin', adminRoutes); // Utilisation des routes admin
+app.use('/api/admin', adminRoutes);
 
-// Endpoint de vérification
-app.get('/health', (req, res) => res.status(200).json({ message: 'Server is running!' }));
-
-// Middleware d'erreur
-app.use((err, req, res, next) => {
-    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-    res.status(statusCode).json({ message: err.message });
+app.use((req, res) => {
+  res.status(404).json({ message: 'Resource not found' });
 });
 
-// Lancement du serveur
-app.listen(PORT, async () => {
+app.use(errorHandler);
+
+const startServer = async () => {
+  try {
     await connectDB();
-    console.log(`Server running on port ${PORT}`);
-});
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

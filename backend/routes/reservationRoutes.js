@@ -1,22 +1,29 @@
-// reservationRoutes.js
 import express from 'express';
-import { 
-  makeReservation, 
-  getUserReservations, 
-  getWorkingDays, 
-  getPastReservations, 
+import {
+  makeReservation,
+  getUserReservations,
+  getWorkingDays,
+  getPastReservations,
   getAllReservations,
-  checkDayAvailability 
+  checkDayAvailability,
+  deleteReservation,
+  updateReservation,
 } from '../controllers/reservationController.js';
-import protect from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', protect, makeReservation);
-router.get('/myreservations', protect, getUserReservations);
+// Public routes
 router.get('/working-days', getWorkingDays);
 router.get('/past-reservations', getPastReservations);
-router.get('/all', protect, getAllReservations);
 router.get('/day-availability', checkDayAvailability);
+
+// Protected routes
+router.use(protect);
+router.post('/', makeReservation);
+router.get('/myreservations', getUserReservations);
+router.get('/all', getAllReservations);
+router.delete('/:id', deleteReservation);
+router.put('/:id', updateReservation);
 
 export default router;

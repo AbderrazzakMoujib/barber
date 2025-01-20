@@ -1,3 +1,4 @@
+// models/Reservation.js
 import mongoose from 'mongoose';
 
 const reservationSchema = mongoose.Schema(
@@ -27,6 +28,10 @@ const reservationSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Add index for better query performance
+reservationSchema.index({ date: 1, timeSlot: 1 });
+reservationSchema.index({ user: 1, status: 1 });
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 export default Reservation;

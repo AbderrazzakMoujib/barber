@@ -1,13 +1,6 @@
 /* Reset and base styles */
-/* * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-} */
-
-/* Main container */
 .calendar-screen {
-  background-color: #7617b6; /* Earthy tone */
+  background-color: #7617b6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,7 +18,6 @@
   margin-bottom: 1.5rem;
 }
 
-
 .calendar-logo {
   width: 70px;
   height: auto;
@@ -34,7 +26,7 @@
 
 /* Main calendar container */
 .calendar-container {
-  background-color: rgb(97 23 182); /* Light beige color */
+  background-color: rgb(97 23 182);
   border-radius: 0.75rem;
   padding: 1.5rem;
   width: 90%;
@@ -57,7 +49,7 @@
 }
 
 .calendar-header button {
-  background-color: #7617b6; /* Warm brown color */
+  background-color: #7617b6;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -100,6 +92,7 @@
   font-weight: 500;
   color: white;
   transition: transform 0.2s ease;
+  position: relative;
 }
 
 .day:hover {
@@ -107,15 +100,23 @@
 }
 
 .working-day {
-  background-color: #16a34a; /* Green for working days */
+  background-color: #16a34a;
 }
 
 .rest-day {
-  background-color: #dc2626; /* Red for rest days */
+  background-color: #dc2626;
 }
 
-.other-month {
-  opacity: 0.4;
+.past-day {
+  background-color: #95a5a6;
+}
+
+.past-with-reservation {
+  background-color: #95a5a6;
+}
+
+.empty {
+  background-color: transparent;
 }
 
 /* Legend */
@@ -150,15 +151,52 @@
 }
 
 .legend-color.past-day {
-  background-color: #95a5a6; /* Gray for past days */
+  background-color: #95a5a6;
 }
 
-.day.rest-day:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+/* Reservation dot styling */
+.reservation-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #0a3de2;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive design */
+@keyframes pulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.reservation-dot:hover {
+  animation: pulse 1s infinite;
+}
+
+.reservation-dot-legend {
+  width: 6px;
+  height: 6px;
+  background-color: #0a3de2;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
   .calendar-container {
     padding: 1rem;
@@ -193,60 +231,4 @@
   .calendar-header h2 {
     font-size: 1.125rem;
   }
-}
-
-/* Add these styles to your existing CSS file */
-
-/* Style for day cells to allow proper dot positioning */
-.day {
-  position: relative;  /* Add this to your existing .day class */
-}
-
-/* Reservation dot indicator */
-.reservation-dot {
-  width: 6px;
-  height: 6px;
-  background-color: #16a34a;  /* Matching your green theme */
-  border-radius: 50%;
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Add dot animation */
-@keyframes pulse {
-  0% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(-50%) scale(1.2);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateX(-50%) scale(1);
-    opacity: 1;
-  }
-}
-
-.reservation-dot:hover {
-  animation: pulse 1s infinite;
-}
-
-/* Add legend dot for admin view */
-.legend-item .reservation-dot-legend {
-  width: 6px;
-  height: 6px;
-  background-color: #16a34a;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 4px;
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Adjust day hover to work with dot */
-.day:hover .reservation-dot {
-  transform: translateX(-50%) scale(1.05);
 }

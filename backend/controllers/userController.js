@@ -1,21 +1,32 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import Admin from '../models/Admin.js';
 import bcrypt from 'bcryptjs';
 import generateTokenAndSetCookie from '../utils/generateToken.js';
 
-// @desc    Get user profile
+// @desc    Get user or admin profile
 // @route   GET /api/users/profile
 // @access  Private
 export const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
+  let user;
+  
+  // Check if it's a user or admin
+  if (req.user) {
+    user = await User.findById(req.user._id).select('-password');
+  } else if (req.admin) {
+    // If it's an admin, fetch admin details
+    user = await Admin.findById(req.admin._id).select('-adminCode');
+  }
+
   if (!user) {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error('User or Admin not found');
   }
+
   res.status(200).json(user);
 });
 
-// @desc    Register new user
+// @desc    Register a new user
 // @route   POST /api/users/register
 // @access  Public
 export const registerUser = asyncHandler(async (req, res) => {
@@ -42,7 +53,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Phone number is already registered');
   }
 
-  // Create user
+  // Create new user
   const newUser = await User.create({
     name,
     user: username,
@@ -72,8 +83,6 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res) => {
   const { user: userInput, password } = req.body;
 
-  console.log('Login attempt:', { userInput });
-
   if (!userInput || !password) {
     res.status(400);
     throw new Error('Please provide both username/phone and password');
@@ -87,8 +96,6 @@ export const loginUser = asyncHandler(async (req, res) => {
     ]
   });
 
-  console.log('User found:', user ? 'Yes' : 'No');
-
   if (!user) {
     res.status(401);
     throw new Error('Invalid username/phone or password');
@@ -96,7 +103,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   // Check password
   const isMatch = await user.matchPassword(password);
-  console.log('Password match:', isMatch);
 
   if (!isMatch) {
     res.status(401);
@@ -104,14 +110,13 @@ export const loginUser = asyncHandler(async (req, res) => {
   }
 
   // Generate token and set cookie
-  const token = generateTokenAndSetCookie(user._id, res);
+  generateTokenAndSetCookie(user._id, res);
 
   res.json({
     _id: user._id,
     name: user.name,
     user: user.user,
-    phone: user.phone,
-    token
+    phone: user.phone
   });
 });
 
@@ -130,20 +135,35 @@ export const logoutUser = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get current user
+// @desc    Get current user profile
 // @route   GET /api/users/user
 // @access  Private
 export const getUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
-  
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
+  let userData;
+
+  if (req?.admin) {
+    const admin = await Admin.findById(req.admin._id).select('-adminCode');
+    
+    if (!admin) {
+      res.status(404);
+      throw new Error('Admin not found');
+    }
+    
+    userData = admin;
+  } else {
+    const user = await User.findById(req?.user?._id).select('-password');
+    
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+    
+    userData = user;
   }
 
   res.status(200).json({
     success: true,
-    user
+    user: userData
   });
 });
 
@@ -205,8 +225,8 @@ export default {
   registerUser,
   loginUser,
   logoutUser,
-  getUserProfile,
   getUser,
   updateUserProfile,
-  deleteUser
+  deleteUser,
+  getUserProfile
 };

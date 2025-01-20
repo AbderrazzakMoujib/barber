@@ -8,13 +8,13 @@ import AvatarDropdown from "../AvatarDropdown/AvatarDropdown";
 import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
 import "./Reservation.css";
 
-const TimeSlot = ({ slot, isReserved, reservedUser, onClick }) => (
+const TimeSlot = ({ slot, isReserved, reservedUser, onClick, isAdmin }) => (
   <div
     className={`slot ${isReserved ? "full" : "empty"}`}
     onClick={() => onClick(slot, !isReserved)}
     style={{
       cursor: isReserved ? "not-allowed" : "pointer",
-      opacity: isReserved ? 0.5 : 1,
+      opacity: isReserved ? 0.8 : 1,
     }}
   >
     <img
@@ -23,8 +23,14 @@ const TimeSlot = ({ slot, isReserved, reservedUser, onClick }) => (
       className="chair-icon"
     />
     <span>{slot}</span>
-    {isReserved && <div className="reserved-overlay">Réservé</div>}
-    {reservedUser && <div className="reserved-user">{reservedUser}</div>}
+    {isReserved && (
+      <>
+        <div className="reserved-overlay">Réservé</div>
+        {isAdmin && reservedUser && (
+          <div className="reserved-user">Par: {reservedUser}</div>
+        )}
+      </>
+    )}
   </div>
 );
 
@@ -32,6 +38,7 @@ const Reservation = () => {
   const { user, setUser, admin } = useContext(Context);
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = Boolean(admin);
@@ -55,28 +62,46 @@ const Reservation = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        setError(null);
+
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = currentDate.getFullYear();
+        const date = format(currentDate, "yyyy-MM-dd");
+
+        const config = {
+          withCredentials: true,
+          headers: { 'Content-Type': 'application/json' },
+        };
+
         const [userResponse, reservationsResponse] = await Promise.all([
-          axios.get("/api/users/user"),
-          axios.get(`/api/reservations/all?date=${format(currentDate, "yyyy-MM-dd")}`),
+          axios.get("/api/users/user", config),
+          axios.get("/api/reservations/all", { ...config, params: { month, year, date } }),
         ]);
+
+        if (!userResponse.data.success) {
+          throw new Error('Failed to fetch user data');
+        }
+
         setUser(userResponse.data.user);
         setReservations(reservationsResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast.error("Erreur lors de la récupération des réservations", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        setError(error);
+        if (error.response?.status === 401) {
+          navigate('/login');
+        } else {
+          toast.error(error.response?.data?.message || "Erreur lors de la récupération des données", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [setUser, currentDate]);
-
-  const getUserInitials = () =>
-    user?.firstName?.charAt(0).toUpperCase() || user?.user?.charAt(0).toUpperCase() || "?";
+  }, [setUser, currentDate, navigate]);
 
   const isSlotReserved = (slot) =>
     reservations.some(
@@ -91,20 +116,31 @@ const Reservation = () => {
         res.timeSlot === slot &&
         new Date(res.date).toDateString() === currentDate.toDateString()
     );
-    return reservation?.user?.firstName || reservation?.user?.name || "Utilisateur";
+    return reservation?.user?.firstName || reservation?.user?.name || "Client";
   };
 
   const handleSlotClick = (slot, isEmpty) => {
     if (!isEmpty) {
-      toast.error(`Le créneau ${slot} est déjà réservé`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      if (isAdmin) {
+        const reservedUser = getReservedUser(slot);
+        toast.info(`Réservé par ${reservedUser}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error(`Le créneau ${slot} est déjà réservé`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
       return;
     }
-    navigate(`/appointment-booking`, {
-      state: { slot, selectedDate: currentDate },
-    });
+
+    if (!isAdmin) {
+      navigate(`/appointment-booking`, {
+        state: { slot, selectedDate: currentDate },
+      });
+    }
   };
 
   if (isLoading) {
@@ -131,7 +167,7 @@ const Reservation = () => {
             </svg>
           </div>
           <div className="user-circles">
-            {isAdmin ? <AdminAvatarDropdown initialName={adminName}/> : <AvatarDropdown />}
+            {isAdmin ? <AdminAvatarDropdown initialName={adminName} /> : <AvatarDropdown />}
           </div>
         </div>
         <img src="logo.png" alt="Logo" className="reservation-logo" />
@@ -139,7 +175,10 @@ const Reservation = () => {
 
       <div className="reservation-container">
         <div className="user-section">
-          <span>Créneaux Horaires pour {format(currentDate, "dd/MM/yyyy")}</span>
+          <span>
+            {isAdmin ? "Réservations pour le " : "Créneaux Horaires pour le "}
+            {format(currentDate, "dd/MM/yyyy")}
+          </span>
         </div>
 
         <div className="schedule-section">
@@ -151,6 +190,7 @@ const Reservation = () => {
                 isReserved={isSlotReserved(slot)}
                 reservedUser={getReservedUser(slot)}
                 onClick={handleSlotClick}
+                isAdmin={isAdmin}
               />
             ))}
           </div>
@@ -165,6 +205,12 @@ const Reservation = () => {
             <img src="chairImage.png" alt="Chair Full" />
             Réservé
           </div>
+          {isAdmin && (
+            <div className="legend-item admin-info">
+              <i className="fas fa-info-circle"></i>
+              Cliquez sur un créneau réservé pour voir les détails
+            </div>
+          )}
         </div>
       </div>
     </div>

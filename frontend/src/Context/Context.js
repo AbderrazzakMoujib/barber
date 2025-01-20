@@ -18,8 +18,12 @@ export const ContextProvider = ({ children }) => {
         try {
             const { data } = await axios.post('/api/admin/login', { code });
             if (data) {
-                setAdmin(data);
-                localStorage.setItem('admin', JSON.stringify(data));
+                const adminData = {
+                    ...data,
+                    isAdmin: true
+                };
+                setAdmin(adminData);
+                localStorage.setItem('admin', JSON.stringify(adminData));
                 setAvatar(data.avatar || data.name.charAt(0).toUpperCase());
             }
             return { success: true };
@@ -34,13 +38,17 @@ export const ContextProvider = ({ children }) => {
 
     const checkAuth = async () => {
         try {
-            setIsLoading(true);
-            const { data } = await axios.get('/api/admin/me');
+            if (!admin?.token) {
+                setIsLoading(false);
+                return;
+            }
             
+            const { data } = await axios.get('/api/admin/me');
             if (data) {
                 const adminData = {
                     ...data,
-                    isAdmin: true
+                    isAdmin: true,
+                    token: admin.token // Preserve the token
                 };
                 setAdmin(adminData);
                 localStorage.setItem('admin', JSON.stringify(adminData));
@@ -59,20 +67,23 @@ export const ContextProvider = ({ children }) => {
     const handleLogout = async () => {
         try {
             await axios.post('/api/admin/logout');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        } finally {
             localStorage.removeItem('admin');
             setAdmin(null);
             setAvatar(null);
-            window.location.href = '/admin/login';
-        } catch (error) {
-            console.error('Logout failed:', error);
+            window.location.href = '/admin-login';
         }
     };
 
     useEffect(() => {
         if (admin?.token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
+            checkAuth();
+        } else {
+            setIsLoading(false);
         }
-        checkAuth();
     }, [admin?.token]);
 
     if (isLoading) {
