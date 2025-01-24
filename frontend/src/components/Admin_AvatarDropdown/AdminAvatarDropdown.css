@@ -35,7 +35,7 @@
 .admin-avatar-dropdown .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
-  right: 50%;
+  right: -22%;
   transform: translateX(50%);
   background-color: white;
   border-radius: 8px;

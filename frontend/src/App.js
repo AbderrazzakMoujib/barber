@@ -14,6 +14,7 @@ import AppointmentBooking from './components/AppointmentBooking/AppointmentBooki
 import NotFound from './components/NotFound';
 import AdminPage from './components/AdminPage/AdminPage';
 import AdminLogin from './components/AdminLogin/AdminLogin';
+import AdminAppel from './components/AdminAppel/AdminAppel';
 import { ContextProvider } from './Context/Context';
 import './App.css';
 
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
     { path: '/appointment-booking', element: <AppointmentBooking /> },
     { path:  '/admin-login', element: <AdminLogin />},
     { path: '/admin', element: <AdminPage /> },
+    { path: '/admin-appels', element: <AdminAppel /> },  // new route for admin appels (replace /admin with /admin/appels)
     { path: '*', element: <NotFound /> }
   ],
   {

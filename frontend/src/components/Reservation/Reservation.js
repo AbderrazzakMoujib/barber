@@ -13,7 +13,7 @@ const TimeSlot = ({ slot, isReserved, reservedUser, onClick, isAdmin }) => (
     className={`slot ${isReserved ? "full" : "empty"}`}
     onClick={() => onClick(slot, !isReserved)}
     style={{
-      cursor: isReserved ? "not-allowed" : "pointer",
+      cursor: isReserved && !isAdmin ? "not-allowed" : "pointer",
       opacity: isReserved ? 0.8 : 1,
     }}
   >
@@ -110,23 +110,37 @@ const Reservation = () => {
         new Date(res.date).toDateString() === currentDate.toDateString()
     );
 
-  const getReservedUser = (slot) => {
-    const reservation = reservations.find(
+  const getReservationDetails = (slot) => {
+    return reservations.find(
       (res) =>
         res.timeSlot === slot &&
         new Date(res.date).toDateString() === currentDate.toDateString()
     );
+  };
+
+  const getReservedUser = (slot) => {
+    const reservation = getReservationDetails(slot);
     return reservation?.user?.firstName || reservation?.user?.name || "Client";
   };
 
   const handleSlotClick = (slot, isEmpty) => {
     if (!isEmpty) {
       if (isAdmin) {
-        const reservedUser = getReservedUser(slot);
-        toast.info(`Réservé par ${reservedUser}`, {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        const reservation = getReservationDetails(slot);
+        if (reservation) {
+          navigate('/admin-appels', {
+            state: {
+              reservation: reservation,
+              date: currentDate,
+              timeSlot: slot
+            }
+          });
+        } else {
+          toast.error("Détails de la réservation non trouvés", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
       } else {
         toast.error(`Le créneau ${slot} est déjà réservé`, {
           position: "top-right",

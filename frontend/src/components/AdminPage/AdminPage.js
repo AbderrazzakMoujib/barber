@@ -32,15 +32,15 @@ const AdminPage = () => {
 
     return (
         <div className="admin-container">
-            <div className="admin-header">
+            <div className="admin-headers">
                 <div className="admin-profile">
                     <h1>Welcome, {adminName}!</h1>
                 </div>
             </div>
 
             <div className="admin-content">
-                <div className="admin-avatar-section">
-                    <div className="avatar-containers">
+                <div className="admin-avatar-sections">
+                    <div className="avatar-containersa">
                         <AdminAvatarDropdown initialName={adminName} />
                     </div>
                 </div>

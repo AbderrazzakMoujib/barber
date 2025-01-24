@@ -6,7 +6,7 @@
     padding: clamp(10px, 2vw, 40px);
 }
 
-.admin-header {
+.admin-headers {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -36,7 +36,7 @@
     margin: 0 auto;
 }
 
-.admin-avatar-section {
+.admin-avatar-sections {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -49,7 +49,7 @@
     margin-right: auto;
 }
 
-.avatar-containers {
+.avatar-containersa {
     display: flex;
     justify-content: center;
     width: 100%;
@@ -85,7 +85,7 @@
 
 /* Mobile First Responsive Design */
 @media (max-width: 768px) {
-    .admin-header {
+    .admin-headers {
         flex-direction: column;
         text-align: center;
     }
@@ -100,7 +100,7 @@
         padding: 5px;
     }
 
-    .admin-header {
+    .admin-headers {
         padding: 10px;
     }
 

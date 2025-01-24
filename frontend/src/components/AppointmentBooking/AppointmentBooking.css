@@ -251,6 +251,7 @@ margin-right: auto;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 3rem;
     margin: 20px 0;
 }
 

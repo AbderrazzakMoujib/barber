@@ -23,7 +23,7 @@
 
 .welcome-text {
   font-size: 1.5rem;
-  color: #333;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -53,7 +53,7 @@
 /* Responsive styles */
 @media (max-width: 768px) {
   .container {
-    height: auto;
+    height: 42rem;
     padding: 15px;
   }
 
@@ -89,7 +89,7 @@
   }
 
   .welcome-text {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
   }
 
   .next-button {

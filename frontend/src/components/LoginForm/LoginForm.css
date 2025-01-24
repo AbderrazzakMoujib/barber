@@ -68,7 +68,7 @@ body {
 .login-container {
   width: 90%;
   max-width: 300px;
-  margin: 50px auto;
+  margin: 10rem auto;
   padding: 20px;
   background-color: rgb(97 23 182);
   border-radius: 10px;
@@ -144,22 +144,53 @@ body {
   font-weight: bold;
 }
 
-/* Add this to your existing LoginForm.css */
 .admin-button {
-  margin-top: 5rem;
-  margin-left: 78rem;
+  position: relative; /* Permet un positionnement flexible */
+  margin-left: auto; /* Pousse le bouton à droite */
+  margin-right: 1.5rem; /* Espace entre le bouton et le bord droit */
   background-color: #16a34a;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  width: 5rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease; /* Effet de transition sur le hover */
+  width: auto; /* Largeur flexible */
+  text-align: center;
 }
 
 .admin-button:hover {
-  background-color: #209930;
+  background-color: #209930; /* Couleur au survol */
 }
+
+@media screen and (max-width: 768px) {
+  .admin-button {
+    margin: 1px 2px 12px 12px;
+    padding: 8px 15px; /* Réduit le padding */
+    font-size: 14px; /* Taille du texte adaptée */
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .admin-button {
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .admin-button {
+    margin-right: 2rem; /* Plus d’espace sur grands écrans */
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+}
+
+
+
 
 @media screen and (min-width: 768px) {
   .login-container {

@@ -2,7 +2,7 @@ import Reservation from '../models/Reservation.js';
 
 export const makeReservation = async (req, res) => {
   try {
-    const { date, timeSlot, partySize } = req.body;
+    const { date, timeSlot, partySize, contactPhone } = req.body;
 
     if (!date || !timeSlot || !partySize) {
       return res.status(400).json({ message: 'Please provide date, time slot, and party size' });
@@ -33,6 +33,7 @@ export const makeReservation = async (req, res) => {
       date,
       timeSlot,
       partySize,
+      contactPhone: contactPhone || req.user.phone
     });
 
     return res.status(201).json(reservation);
@@ -128,7 +129,10 @@ export const getAllReservations = async (req, res) => {
         $gte: startDate,
         $lte: endDate
       }
-    }).populate('user', 'firstName name');
+    }).populate({
+      path: 'user',
+      select: 'name phone'  // Explicitly select name and phone
+    });
 
     return res.status(200).json(reservations);
   } catch (error) {
@@ -136,6 +140,7 @@ export const getAllReservations = async (req, res) => {
     return res.status(500).json({ message: 'Error fetching all reservations' });
   }
 };
+
 
 export const checkDayAvailability = async (req, res) => {
   try {
