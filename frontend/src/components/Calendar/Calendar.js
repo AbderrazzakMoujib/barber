@@ -106,19 +106,19 @@ const Calendar = () => {
       toast.error("Erreur lors de la vérification de la disponibilité ❌");
       return false;
     }
-  };
-
-  const handleDayClick = async (date, status) => {
+   };
+   
+   const handleDayClick = async (date, status) => {
     if (status === "rest-day") {
       toast.error("Ce jour n'est pas disponible pour la réservation ⛔");
       return;
     }
-
+   
     if (status === "past-day" || status === "past-with-reservation") {
       toast.warning("Impossible de réserver des dates passées ⚠️");
       return;
     }
-
+   
     if (status === "working-day") {
       if (!isAdmin) {
         const hasAvailability = await checkDayAvailability(date);
@@ -132,7 +132,7 @@ const Calendar = () => {
         state: { selectedDate: format(date, "yyyy-MM-dd") },
       });
     }
-  };
+   };
 
   const getDayStatus = (date) => {
     const dayNumber = parseInt(format(date, "d"));

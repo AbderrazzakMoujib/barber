@@ -2,44 +2,61 @@ import Reservation from '../models/Reservation.js';
 
 export const makeReservation = async (req, res) => {
   try {
-    const { date, timeSlot, partySize, contactPhone } = req.body;
-
+    const { date, timeSlot, partySize } = req.body;
+    
+    // Validate input
     if (!date || !timeSlot || !partySize) {
-      return res.status(400).json({ message: 'Please provide date, time slot, and party size' });
+      return res.status(400).json({ message: 'Missing reservation details' });
     }
 
-    // Check if max reservations reached for the day
+    const formattedDate = new Date(date);
+    
+    // Set time to start and end of day for precise date matching
+    const startOfDay = new Date(formattedDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(formattedDate.setHours(23, 59, 59, 999));
+
+    // Check total daily reservations
+    const totalSlots = 19;
     const dayReservations = await Reservation.find({
-      date: {
-        $gte: new Date(date + 'T00:00:00.000Z'),
-        $lt: new Date(date + 'T23:59:59.999Z')
-      }
+      date: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    const totalSlots = 21;
     if (dayReservations.length >= totalSlots) {
       return res.status(400).json({ 
-        message: 'All slots are full for this day. Please select another day.' 
+        message: 'All slots are full for this day',
+        availableSlots: 0
       });
     }
 
-    const existingReservation = await Reservation.findOne({ date, timeSlot });
-    if (existingReservation) {
-      return res.status(400).json({ message: 'Time slot already reserved' });
-    }
-
-    const reservation = await Reservation.create({
+    // Attempt to create reservation with unique constraint
+    const reservation = new Reservation({
       user: req.user._id,
-      date,
+      date: startOfDay,
       timeSlot,
       partySize,
-      contactPhone: contactPhone || req.user.phone
+      contactPhone: req.user.phone
     });
 
-    return res.status(201).json(reservation);
+    try {
+      await reservation.save();
+      return res.status(201).json(reservation);
+    } catch (saveError) {
+      // Handle potential duplicate key error
+      if (saveError.code === 11000) {
+        return res.status(400).json({ 
+          message: 'This time slot is already booked',
+          errorCode: 'SLOT_TAKEN'
+        });
+      }
+      throw saveError;
+    }
+
   } catch (error) {
-    console.error('Error creating reservation:', error);
-    return res.status(500).json({ message: 'Error creating reservation' });
+    console.error('Reservation creation error:', error);
+    return res.status(500).json({ 
+      message: 'Reservation creation failed',
+      error: error.message 
+    });
   }
 };
 
@@ -49,8 +66,8 @@ export const getUserReservations = async (req, res) => {
       .sort({ date: 'asc' });
     return res.status(200).json(reservations);
   } catch (error) {
-    console.error('Error fetching reservations:', error);
-    return res.status(500).json({ message: 'Error fetching reservations' });
+    console.error('Error fetching user reservations:', error);
+    return res.status(500).json({ message: 'Error fetching user reservations' });
   }
 };
 
@@ -113,51 +130,51 @@ export const getPastReservations = async (req, res) => {
 
 export const getAllReservations = async (req, res) => {
   try {
-    const { month, year } = req.query;
-
-    if (!month || !year) {
-      return res.status(400).json({ 
-        message: 'Month and year are required' 
-      });
-    }
+    const { month, year, date } = req.query;
 
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
-    const reservations = await Reservation.find({
+    const query = {
       date: {
         $gte: startDate,
         $lte: endDate
       }
-    }).populate({
+    };
+
+    if (date) {
+      const specificDate = new Date(date);
+      query.date = {
+        $gte: new Date(specificDate.setHours(0,0,0,0)),
+        $lt: new Date(specificDate.setHours(23,59,59,999))
+      };
+    }
+
+    const reservations = await Reservation.find(query).populate({
       path: 'user',
-      select: 'name phone'  // Explicitly select name and phone
+      select: 'name phone' 
     });
 
     return res.status(200).json(reservations);
   } catch (error) {
-    console.error('Error fetching all reservations:', error);
-    return res.status(500).json({ message: 'Error fetching all reservations' });
+    console.error('Fetching reservations error:', error);
+    return res.status(500).json({ message: 'Error fetching reservations' });
   }
 };
-
 
 export const checkDayAvailability = async (req, res) => {
   try {
     const { date } = req.query;
-
-    if (!date) {
-      return res.status(400).json({ message: 'Date is required' });
-    }
+    const formattedDate = new Date(date);
 
     const reservations = await Reservation.find({
       date: {
-        $gte: new Date(date + 'T00:00:00.000Z'),
-        $lt: new Date(date + 'T23:59:59.999Z')
+        $gte: new Date(formattedDate.setHours(0,0,0,0)),
+        $lt: new Date(formattedDate.setHours(23,59,59,999))
       }
     });
 
-    const totalSlots = 21;
+    const totalSlots = 19;
     const hasAvailability = reservations.length < totalSlots;
 
     res.json({ 

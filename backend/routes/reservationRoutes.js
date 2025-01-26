@@ -16,7 +16,7 @@ const router = express.Router();
 // Public routes
 router.get('/working-days', getWorkingDays);
 router.get('/past-reservations', getPastReservations);
-router.get('/day-availability', checkDayAvailability);
+router.get('/day-availability', protect, checkDayAvailability);
 
 // Protected routes
 router.use(protect);
