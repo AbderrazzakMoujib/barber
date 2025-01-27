@@ -1,3 +1,4 @@
+// Updated server.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
@@ -9,6 +10,7 @@ import connectDB from './db/connectDB.js';
 import userRoutes from './routes/userRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import languageRoutes from './routes/languageRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 dotenv.config();
@@ -52,6 +54,7 @@ app.get('/health', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/language', languageRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Resource not found' });

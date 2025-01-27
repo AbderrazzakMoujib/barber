@@ -66,3 +66,17 @@
     background-color: #45a06b;
   }
   
+  .booking-container[dir="rtl"] {
+    direction: rtl;
+  }
+  
+  /* Add specific RTL adjustments if needed */
+  [dir="rtl"] .booking-card {
+    text-align: right;
+  }
+  
+  /* You might want to adjust button padding/margins for RTL */
+  [dir="rtl"] .booking-button {
+    margin-left: 0;
+    margin-right: auto;
+  }

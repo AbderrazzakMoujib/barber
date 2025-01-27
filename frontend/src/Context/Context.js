@@ -1,4 +1,3 @@
-// src/Context/Context.js
 import React, { createContext, useState, useEffect } from 'react';
 import axios from '../fetch/fetch';
 
@@ -12,6 +11,10 @@ export const ContextProvider = ({ children }) => {
     });
     const [avatar, setAvatar] = useState(null);
     const [reservations, setReservations] = useState([]);
+    const [language, setLanguage] = useState(() => {
+        const storedLanguage = localStorage.getItem('language');
+        return storedLanguage || 'en';
+    });
     const [isLoading, setIsLoading] = useState(true);
 
     const loginAdmin = async (code) => {
@@ -20,7 +23,7 @@ export const ContextProvider = ({ children }) => {
             if (data) {
                 const adminData = {
                     ...data,
-                    isAdmin: true
+                    isAdmin: true,
                 };
                 setAdmin(adminData);
                 localStorage.setItem('admin', JSON.stringify(adminData));
@@ -29,9 +32,9 @@ export const ContextProvider = ({ children }) => {
             return { success: true };
         } catch (error) {
             console.error('Login failed:', error);
-            return { 
-                success: false, 
-                error: error.response?.data?.message || 'Login failed' 
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Login failed',
             };
         }
     };
@@ -42,13 +45,13 @@ export const ContextProvider = ({ children }) => {
                 setIsLoading(false);
                 return;
             }
-            
+
             const { data } = await axios.get('/api/admin/me');
             if (data) {
                 const adminData = {
                     ...data,
                     isAdmin: true,
-                    token: admin.token // Preserve the token
+                    token: admin.token, // Preserve the token
                 };
                 setAdmin(adminData);
                 localStorage.setItem('admin', JSON.stringify(adminData));
@@ -77,6 +80,25 @@ export const ContextProvider = ({ children }) => {
         }
     };
 
+    const setLanguagePreference = async (newLanguage) => {
+        try {
+            // Update local state immediately for better UX
+            setLanguage(newLanguage);
+            localStorage.setItem('language', newLanguage);
+
+            // If user is logged in, sync with backend
+            if (user?._id || admin?.token) {
+                const { data } = await axios.post('/api/language/set', { language: newLanguage });
+                console.log(`Language set to: ${data.language}`);
+            }
+        } catch (error) {
+            console.error('Error setting language:', error);
+            // Optionally revert on error
+            const storedLanguage = localStorage.getItem('language');
+            setLanguage(storedLanguage || 'en');
+        }
+    };
+
     useEffect(() => {
         if (admin?.token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
@@ -87,23 +109,31 @@ export const ContextProvider = ({ children }) => {
     }, [admin?.token]);
 
     if (isLoading) {
-        return null;
+        return <div>
+            {language === 'ar' ? 'جاري التحميل...' : 
+             language === 'fr' ? 'Chargement...' : 
+             'Loading...'}
+        </div>;
     }
 
     return (
-        <Context.Provider value={{ 
-            user, 
-            setUser, 
-            admin,
-            setAdmin,
-            avatar, 
-            setAvatar,
-            reservations, 
-            setReservations,
-            handleLogout,
-            checkAuth,
-            loginAdmin
-        }}>
+        <Context.Provider
+            value={{
+                user,
+                setUser,
+                admin,
+                setAdmin,
+                avatar,
+                setAvatar,
+                reservations,
+                setReservations,
+                handleLogout,
+                checkAuth,
+                loginAdmin,
+                language,
+                setLanguagePreference,
+            }}
+        >
             {children}
         </Context.Provider>
     );

@@ -6,7 +6,7 @@ const LandingPage = () => {
   
   return (
     <div className="landing-page">
-      <Link to="/booking"> {/* Redirige vers la page d'accueil */}
+      <Link to="/language"> {/* Redirige vers la page d'accueil */}
         <img src="/logo.PNG" alt="Barber Reda Logo" className="logo" />
       </Link>
     </div>

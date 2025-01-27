@@ -232,3 +232,28 @@
     font-size: 1.125rem;
   }
 }
+
+.rtl {
+  direction: rtl;
+}
+
+.rtl .calendar-container {
+  direction: rtl;
+}
+
+.rtl .day-name,
+.rtl .day {
+  direction: rtl;
+}
+
+.rtl .legend-item {
+  direction: rtl;
+}
+
+.rtl .calendar-header {
+  direction: rtl;
+}
+
+.rtl .month-nav-button {
+  transform: scaleX(-1);
+}

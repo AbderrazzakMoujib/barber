@@ -89,3 +89,33 @@ body {
         font-size: 12px; /* Smaller font size for text */
     }
 }
+
+/* Add these to your SignInForm.css file */
+
+/* RTL Support */
+[dir="rtl"] .signin-form {
+    text-align: right;
+}
+
+[dir="rtl"] .signin-form input {
+    text-align: right;
+}
+
+[dir="rtl"] .error-message {
+    text-align: right;
+}
+
+[dir="rtl"] .login-text {
+    text-align: right;
+}
+
+/* Fix input padding for RTL */
+[dir="rtl"] .signin-form input {
+    padding: 10px 15px 10px 40px;
+}
+
+/* Adjust any icons or decorative elements if needed */
+[dir="rtl"] .signin-form .icon {
+    right: auto;
+    left: 10px;
+}

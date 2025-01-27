@@ -97,3 +97,25 @@
     font-size: 0.8rem;
   }
 }
+
+/* Add these to your AppointmentScreen.css file */
+
+/* RTL Support */
+[dir="rtl"] .container {
+  direction: rtl;
+}
+
+[dir="rtl"] .welcome-text {
+  text-align: right;
+}
+
+[dir="rtl"] .next-button {
+  /* If you need to adjust button positioning for RTL */
+  margin-left: 0;
+}
+
+/* If your design needs any specific RTL adjustments for the avatar dropdown */
+[dir="rtl"] .user-circler {
+  left: auto;
+  right: 20px; /* Adjust based on your design */
+}

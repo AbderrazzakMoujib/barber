@@ -14,6 +14,7 @@ import AppointmentBooking from './components/AppointmentBooking/AppointmentBooki
 import NotFound from './components/NotFound';
 import AdminPage from './components/AdminPage/AdminPage';
 import AdminLogin from './components/AdminLogin/AdminLogin';
+import Language from './components/Language/language';  // new component for language selection (replace /language with /language)  // new route for language selection (replace / with /language)  // new component for language selection (replace /language with /language)  // new route for language selection (replace / with /language)  // new component for language selection (replace /language with /language)  // new route for language selection (replace / with /language)  //
 import AdminAppel from './components/AdminAppel/AdminAppel';
 import { ContextProvider } from './Context/Context';
 import './App.css';
@@ -21,6 +22,7 @@ import './App.css';
 const router = createBrowserRouter(
   [
     { path: '/', element: <LandingPage /> },
+    { path: '/language', element: <Language /> }, // Nouvelle route ajoutée
     { path: '/booking', element: <BookingComponent /> },
     { path: '/login', element: <LoginForm /> },
     { path: '/sign-in', element: <SignInForm /> },
