@@ -1,17 +1,19 @@
+/* LandingPage.css */
+
 /* Center the content in the page */
 .landing-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #7617b6; /* Black background */
+  background-color: #7617b6; /* Purple background */
 }
 
 /* Style the logo image */
 .logo {
   max-width: 90%; /* Limite la largeur à 90% de l'écran */
   height: auto; /* Maintient le ratio d'aspect */
-  animation: spin 4s linear infinite; /* Appliquer l'animation */
+  animation: spin 2s linear infinite; /* Animation plus rapide (2s par rotation) */
 }
 
 /* Définition de l'animation de rotation */
@@ -27,7 +29,7 @@
 /* Styles spécifiques pour les appareils mobiles */
 @media (max-width: 600px) {
   .logo {
-    margin-left: 3rem;
+
     max-width: 70%; /* Réduire la largeur maximale à 70% sur mobile */
   }
 }

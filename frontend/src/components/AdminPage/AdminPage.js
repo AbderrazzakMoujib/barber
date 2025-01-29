@@ -8,7 +8,7 @@ import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
 const AdminPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { admin, setAdmin } = useContext(Context);
+    const { admin, setAdmin, language, setLanguagePreference } = useContext(Context); // Add language context
     const adminName = admin?.name || location.state?.adminName || 'Admin';
 
     useEffect(() => {
@@ -30,11 +30,48 @@ const AdminPage = () => {
         }
     };
 
+    // Handle language selection
+    const handleLanguageClick = async (selectedLanguage) => {
+        try {
+            await setLanguagePreference(selectedLanguage);
+            alert(`Language set to ${selectedLanguage === 'ar' ? 'Arabic' : selectedLanguage === 'fr' ? 'French' : 'English'}`);
+        } catch (error) {
+            console.error('Error setting language:', error);
+            alert('Failed to set language');
+        }
+    };
+
     return (
         <div className="admin-container">
             <div className="admin-headers">
                 <div className="admin-profile">
-                    <h1>Welcome, {adminName}!</h1>
+                    <h1>
+                        {language === 'ar' ? 'مرحبًا' : 
+                         language === 'fr' ? 'Bienvenue' : 
+                         'Welcome'}, {adminName}!
+                    </h1>
+                </div>
+
+                {/* Language Selection Buttons */}
+                <div className="language-buttons">
+                    <button
+                        className={`language-button ${language === 'ar' ? 'active' : ''}`}
+                        onClick={() => handleLanguageClick('ar')}
+                    >
+                        Arabe/العربية
+                    </button>
+                    <button
+                        className={`language-button ${language === 'fr' ? 'active' : ''}`}
+                        onClick={() => handleLanguageClick('fr')}
+                    >
+                        Français
+                    </button>
+                    <button
+                        className={`language-button ${language === 'en' ? 'active' : ''}`}
+                        onClick={() => handleLanguageClick('en')}
+                    >
+                        English
+                    </button>
                 </div>
             </div>
 
@@ -47,7 +84,9 @@ const AdminPage = () => {
 
                 <div className="admin-actions">
                     <Link to="/calendar" className="fix-next-button">
-                        Fix Next
+                        {language === 'ar' ? 'التقويم' : 
+                         language === 'fr' ? 'Calendrier' : 
+                         'Calendar'}
                     </Link>
                 </div>
             </div>

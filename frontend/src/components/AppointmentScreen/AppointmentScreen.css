@@ -1,121 +1,176 @@
-.container {
+/* AppointmentScreen.css */
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #7617b6, #4a0e73);
+  padding: 2rem 1rem;
+}
+
+.header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #7617b6;
-  padding: 20px;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
 }
 
-.logo3 {
-  width: 150px;
-  margin-bottom: 20px;
+.logo {
+  height: 48px;
+  width: auto;
 }
 
+.avatar-container {
+  width: 40px;
+  height: 40px;
+}
 
+.welcome-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
 
-.avatar-initial {
+.welcome-title {
   color: white;
-  font-size: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  color: #e2c6ff;
+  font-size: 1.125rem;
+}
+
+.services-section {
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.services-title {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.services-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.service-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.service-card:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.service-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-name {
+  color: white;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.service-duration {
+  display: flex;
+  align-items: center;
+  color: #e2c6ff;
+  font-size: 0.875rem;
+}
+
+.duration-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.25rem;
+}
+
+.service-price {
+  color: white;
   font-weight: bold;
 }
 
-.welcome-text {
-  font-size: 1.5rem;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-align: center;
-}
-
-.left-icon {
-  width: 24px;
-  height: 24px;
-}
-
 .next-button {
-  margin-top: 20px;
-  padding: 10px 20px;
+  width: calc(100% - 2rem);
+  margin: 0 1rem;
   background-color: #45a049;
   color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
 }
 
 .next-button:hover {
-  background-color: #1a6b35;
+  background-color: #3d8b41;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .container {
-    height: 42rem;
-    padding: 15px;
-  }
-
-  .logo3 {
-    width: 120px;
-  }
-
- 
-
-  .avatar-initial {
-    font-size: 1.25rem;
-  }
-
-  .welcome-text {
-    font-size: 1.25rem;
-  }
-
-  .next-button {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
+.button-icon {
+  width: 20px;
+  height: 20px;
 }
-
-@media (max-width: 480px) {
-  .logo3 {
-    width: 100px;
-  }
-
-
-
-  .avatar-initial {
-    font-size: 1.1rem;
-  }
-
-  .welcome-text {
-    font-size: 1.3rem;
-  }
-
-  .next-button {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-}
-
-/* Add these to your AppointmentScreen.css file */
 
 /* RTL Support */
-[dir="rtl"] .container {
-  direction: rtl;
+[dir="rtl"] .duration-icon {
+  margin-right: 0;
+  margin-left: 0.25rem;
 }
 
-[dir="rtl"] .welcome-text {
-  text-align: right;
+/* Responsive Design */
+@media (min-width: 640px) {
+  .app-container {
+      padding: 2rem;
+  }
+
+  .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-[dir="rtl"] .next-button {
-  /* If you need to adjust button positioning for RTL */
-  margin-left: 0;
+@media (min-width: 1024px) {
+  .app-container {
+      padding: 3rem;
+  }
+
+  .services-grid {
+      grid-template-columns: repeat(3, 1fr);
+  }
+
+  .welcome-title {
+      font-size: 2.5rem;
+  }
+
+  .welcome-subtitle {
+      font-size: 1.25rem;
+  }
 }
 
-/* If your design needs any specific RTL adjustments for the avatar dropdown */
-[dir="rtl"] .user-circler {
-  left: auto;
-  right: 20px; /* Adjust based on your design */
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .service-card {
+      background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .service-card:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+  }
 }

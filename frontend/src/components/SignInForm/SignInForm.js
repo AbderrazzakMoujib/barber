@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { User, Phone, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import './SignInForm.css';
 import axiosInstance from '../../fetch/fetch.js';
 import { Context } from '../../Context/Context';
@@ -8,6 +9,7 @@ import { Context } from '../../Context/Context';
 const SignInForm = () => {
     const navigate = useNavigate();
     const { language } = useContext(Context);
+    const [showPassword, setShowPassword] = useState(false);
     
     const [formData, setFormData] = useState({
         name: '',
@@ -18,10 +20,9 @@ const SignInForm = () => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Multilingual texts
     const texts = {
         en: {
-            name: "Name",
+            name: "Full Name",
             username: "Username",
             phone: "Phone Number",
             password: "Password",
@@ -30,6 +31,8 @@ const SignInForm = () => {
             signingIn: "Signing In...",
             haveAccount: "Already have an account?",
             login: "Login",
+            createAccount: "Create an account",
+            letsGetStarted: "Let's get you started",
             // Validation messages
             nameRequired: "Name is required",
             userRequired: "Username is required",
@@ -42,7 +45,7 @@ const SignInForm = () => {
             registrationFailed: "Registration failed"
         },
         fr: {
-            name: "Nom",
+            name: "Nom complet",
             username: "Nom d'utilisateur",
             phone: "Numéro de téléphone",
             password: "Mot de passe",
@@ -51,6 +54,8 @@ const SignInForm = () => {
             signingIn: "Inscription en cours...",
             haveAccount: "Vous avez déjà un compte ?",
             login: "Connexion",
+            createAccount: "Créer un compte",
+            letsGetStarted: "Commençons",
             // Validation messages
             nameRequired: "Le nom est requis",
             userRequired: "Le nom d'utilisateur est requis",
@@ -63,7 +68,7 @@ const SignInForm = () => {
             registrationFailed: "Échec de l'inscription"
         },
         ar: {
-            name: "الاسم",
+            name: "الاسم الكامل",
             username: "اسم المستخدم",
             phone: "رقم الهاتف",
             password: "كلمة المرور",
@@ -72,6 +77,8 @@ const SignInForm = () => {
             signingIn: "جاري التسجيل...",
             haveAccount: "لديك حساب بالفعل؟",
             login: "تسجيل الدخول",
+            createAccount: "إنشاء حساب",
+            letsGetStarted: "هيا نبدأ",
             // Validation messages
             nameRequired: "الاسم مطلوب",
             userRequired: "اسم المستخدم مطلوب",
@@ -89,21 +96,19 @@ const SignInForm = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-           // For phone, only allow digits
+        let processedValue = value;
+
+        // For phone, only allow digits
         if (name === 'phone') {
-            const numbersOnly = value.replace(/\D/g, '').slice(0, 10);
-            setFormData(prev => ({
-                ...prev,
-                [name]: numbersOnly
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
+            processedValue = value.replace(/\D/g, '').slice(0, 10);
         }
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: processedValue.trim()
+        }));
         
-       // Clear error when user starts typing
+        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -124,8 +129,7 @@ const SignInForm = () => {
         } else if (formData.user.length < 3) {
             newErrors.user = currentTexts.userLength;
         }
-
-        // Simple 10-digit validation        
+        
         if (!formData.phone) {
             newErrors.phone = currentTexts.phoneRequired;
         } else if (formData.phone.length !== 10) {
@@ -158,7 +162,6 @@ const SignInForm = () => {
             const errorMessage = err.response?.data?.message || currentTexts.registrationFailed;
             toast.error(errorMessage);
             
-            // Handle specific backend errors            
             if (err.response?.data?.field) {
                 setErrors(prev => ({
                     ...prev,
@@ -175,64 +178,103 @@ const SignInForm = () => {
             <div className="logo5">
                 <img className='logo-img3' src="/logo.PNG" alt="Logo" />
             </div>
-            <form className="signin-form" onSubmit={handleSubmit}>
-                <label htmlFor="name">{currentTexts.name}</label>
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    placeholder={currentTexts.name}
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={errors.name ? 'error' : ''}
-                />
-                {errors.name && <span className="error-message">{errors.name}</span>}
 
-                <label htmlFor="user">{currentTexts.username}</label>
-                <input
-                    type="text"
-                    id="user"
-                    name="user"
-                    placeholder={currentTexts.username}
-                    value={formData.user}
-                    onChange={handleChange}
-                    className={errors.user ? 'error' : ''}
-                />
-                {errors.user && <span className="error-message">{errors.user}</span>}
+            <div className="welcome-text">
+                <h2>{currentTexts.createAccount}</h2>
+                <p>{currentTexts.letsGetStarted}</p>
+            </div>
 
-                <label htmlFor="phone">{currentTexts.phone}</label>
-                <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    placeholder={currentTexts.enterPhone}
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={errors.phone ? 'error' : ''}
-                />
-                {errors.phone && <span className="error-message">{errors.phone}</span>}
+            <form className="signin-forms" onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label htmlFor="name">{currentTexts.name}</label>
+                    <div className="input-containe">
+                        <User className="input-icon" />
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder={currentTexts.name}
+                            value={formData.name}
+                            onChange={handleChange}
+                            className={errors.name ? 'error' : ''}
+                        />
+                    </div>
+                    {errors.name && <span className="error-message">{errors.name}</span>}
+                </div>
 
-                <label htmlFor="password">{currentTexts.password}</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder={currentTexts.password}
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={errors.password ? 'error' : ''}
-                />
-                {errors.password && <span className="error-message">{errors.password}</span>}
+                <div className="form-group">
+                    <label htmlFor="user">{currentTexts.username}</label>
+                    <div className="input-containe">
+                        <Mail className="input-icon" />
+                        <input
+                            type="text"
+                            id="user"
+                            name="user"
+                            placeholder={currentTexts.username}
+                            value={formData.user}
+                            onChange={handleChange}
+                            className={errors.user ? 'error' : ''}
+                        />
+                    </div>
+                    {errors.user && <span className="error-message">{errors.user}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="phone">{currentTexts.phone}</label>
+                    <div className="input-containe">
+                        <Phone className="input-icon" />
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder={currentTexts.enterPhone}
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className={errors.phone ? 'error' : ''}
+                        />
+                    </div>
+                    {errors.phone && <span className="error-message">{errors.phone}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="password">{currentTexts.password}</label>
+                    <div className="input-container">
+                        <Lock className="input-icon" />
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            name="password"
+                            placeholder={currentTexts.password}
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={errors.password ? 'error' : ''}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="password-toggles"
+                        >
+                            {showPassword ? 
+                                <EyeOff className="toggle-icon" /> : 
+                                <Eye className="toggle-icon" />
+                            }
+                        </button>
+                    </div>
+                    {errors.password && <span className="error-message">{errors.password}</span>}
+                </div>
 
                 <button 
                     type="submit" 
                     disabled={isSubmitting}
+                    className={`signin-button ${isSubmitting ? 'loading' : ''}`}
                 >
                     {isSubmitting ? currentTexts.signingIn : currentTexts.signIn}
                 </button>
             </form>
+
             <p className="login-text">
-                {currentTexts.haveAccount} <a href="/login">{currentTexts.login}</a>
+                {currentTexts.haveAccount}{' '}
+                <a href="/login">{currentTexts.login}</a>
             </p>
         </div>
     );

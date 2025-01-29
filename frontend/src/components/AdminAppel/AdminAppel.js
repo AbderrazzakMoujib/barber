@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const AdminAppel = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { admin } = useContext(Context);
+  const { admin, language, setLanguagePreference } = useContext(Context); // Add language context
   const { reservation, date, timeSlot } = location.state || {};
 
   const handleBackClick = () => {
@@ -19,21 +19,60 @@ const AdminAppel = () => {
     const phoneNumber = 
       reservation?.user?.phone || 
       reservation?.phone || 
-      "Non disponible";
+      (language === 'ar' ? 'غير متوفر' : 
+       language === 'fr' ? 'Non disponible' : 
+       'Not available');
     
-    if (phoneNumber !== "Non disponible") {
+    if (phoneNumber !== (language === 'ar' ? 'غير متوفر' : 
+                         language === 'fr' ? 'Non disponible' : 
+                         'Not available')) {
       window.location.href = `tel:${phoneNumber}`;
     } else {
-      toast.error("Numéro de téléphone non disponible");
+      toast.error(
+        language === 'ar' ? 'رقم الهاتف غير متوفر' : 
+        language === 'fr' ? 'Numéro de téléphone non disponible' : 
+        'Phone number not available'
+      );
+    }
+  };
+
+  // Handle language selection
+  const handleLanguageClick = async (selectedLanguage) => {
+    try {
+      await setLanguagePreference(selectedLanguage);
+      toast.success(
+        language === 'ar' ? 'تم تعيين اللغة بنجاح' : 
+        language === 'fr' ? 'Langue définie avec succès' : 
+        'Language set successfully'
+      );
+    } catch (error) {
+      console.error('Error setting language:', error);
+      toast.error(
+        language === 'ar' ? 'فشل تعيين اللغة' : 
+        language === 'fr' ? 'Échec de la définition de la langue' : 
+        'Failed to set language'
+      );
     }
   };
 
   if (!reservation) {
-    return <div className="admin-appel">Aucune information de réservation disponible</div>;
+    return (
+      <div className="admin-appel">
+        {language === 'ar' ? 'لا توجد معلومات الحجز متاحة' : 
+         language === 'fr' ? 'Aucune information de réservation disponible' : 
+         'No reservation information available'}
+      </div>
+    );
   }
 
-  const userName = reservation.user?.name || "Non disponible";
-  const userPhone = reservation.user?.phone || "Non disponible";
+  const userName = reservation.user?.name || 
+    (language === 'ar' ? 'غير متوفر' : 
+     language === 'fr' ? 'Non disponible' : 
+     'Not available');
+  const userPhone = reservation.user?.phone || 
+    (language === 'ar' ? 'غير متوفر' : 
+     language === 'fr' ? 'Non disponible' : 
+     'Not available');
 
   return (
     <div className="admin-appel">
@@ -56,6 +95,29 @@ const AdminAppel = () => {
           </div>
           <AdminAvatarDropdown initialName={admin?.name || 'Admin'} />
         </div>
+
+        {/* Language Selection Buttons */}
+        <div className="language-buttons">
+          <button
+            className={`language-button ${language === 'ar' ? 'active' : ''}`}
+            onClick={() => handleLanguageClick('ar')}
+          >
+            Arabe/العربية
+          </button>
+          <button
+            className={`language-button ${language === 'fr' ? 'active' : ''}`}
+            onClick={() => handleLanguageClick('fr')}
+          >
+            Français
+          </button>
+          <button
+            className={`language-button ${language === 'en' ? 'active' : ''}`}
+            onClick={() => handleLanguageClick('en')}
+          >
+            English
+          </button>
+        </div>
+
         <img src="/logo.png" alt="Logo" className="admin-logo" />
       </div>
 
@@ -65,22 +127,36 @@ const AdminAppel = () => {
             <img src="/chairImage.png" alt="Chair Full" />
           </div>
           <p className="reservation-time">
-            Créneau: {timeSlot}, Date: {new Date(date).toLocaleDateString()}
+            {language === 'ar' ? 'الوقت:' : 
+             language === 'fr' ? 'Créneau:' : 
+             'Time Slot:'} {timeSlot}, {language === 'ar' ? 'التاريخ:' : 
+             language === 'fr' ? 'Date:' : 
+             'Date:'} {new Date(date).toLocaleDateString()}
           </p>
           {reservation.partySize && (
             <p className="party-size">
-              Nombre de personnes: {reservation.partySize}
+              {language === 'ar' ? 'عدد الأشخاص:' : 
+               language === 'fr' ? 'Nombre de personnes:' : 
+               'Party Size:'} {reservation.partySize}
             </p>
           )}
         </div>
 
         <div className="client-info">
           <div className="info-field">
-            <label>Nom:</label>
+            <label>
+              {language === 'ar' ? 'الاسم:' : 
+               language === 'fr' ? 'Nom:' : 
+               'Name:'}
+            </label>
             <span>{userName}</span>
           </div>
           <div className="info-field">
-            <label>Téléphone:</label>
+            <label>
+              {language === 'ar' ? 'الهاتف:' : 
+               language === 'fr' ? 'Téléphone:' : 
+               'Phone:'}
+            </label>
             <span>{userPhone}</span>
           </div>
         </div>
@@ -88,9 +164,13 @@ const AdminAppel = () => {
         <button 
           className="call-button" 
           onClick={handleCall}
-          disabled={userPhone === "Non disponible"}
+          disabled={userPhone === (language === 'ar' ? 'غير متوفر' : 
+                                  language === 'fr' ? 'Non disponible' : 
+                                  'Not available')}
         >
-          📞 Appeler le client
+          📞 {language === 'ar' ? 'اتصل بالعميل' : 
+              language === 'fr' ? 'Appeler le client' : 
+              'Call the client'}
         </button>
       </div>
     </div>
