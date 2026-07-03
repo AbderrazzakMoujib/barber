@@ -1,0 +1,49 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+      # استخدام الذاكرة المؤقتة للحفاظ على وحدات npm
+      cache_from:
+        - node:18
+    container_name: barber-backend
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/barber-db
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    # إضافة حجم للـnode_modules لتسريع البناء
+    volumes:
+      - backend-node-modules:/app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      cache_from:
+        - node:18-slim
+    container_name: barber-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    # إضافة حجم للـnode_modules لتسريع البناء
+    volumes:
+      - frontend-node-modules:/app/node_modules
+
+volumes:
+  mongo-data:
+  backend-node-modules:
+  frontend-node-modules:

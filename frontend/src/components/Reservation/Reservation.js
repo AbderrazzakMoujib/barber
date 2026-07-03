@@ -6,9 +6,8 @@ import axios from "../../fetch/fetch";
 import { Context } from "../../Context/Context";
 import AvatarDropdown from "../AvatarDropdown/AvatarDropdown";
 import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
-import "./Reservation.css"; // Regular CSS file
+import "./Reservation.css";
 
-// Translations for multi-language support
 const translations = {
   en: {
     loading: "Loading...",
@@ -39,18 +38,16 @@ const translations = {
   },
 };
 
-// Helper function to get translations
 const getTranslation = (key, language) => {
-  return translations[language]?.[key] || translations["en"][key]; // Fallback to English
+  return translations[language]?.[key] || translations["en"][key];
 };
 
-// TimeSlot Component (Memoized for performance)
 const TimeSlot = React.memo(({ slot, isReserved, reservedUser, onClick, isAdmin }) => {
   const handleClick = useCallback(() => onClick(slot, !isReserved), [onClick, slot, isReserved]);
 
   return (
     <div
-      className={`slot ${isReserved ? "full" : "empty"}`} // Use class names as strings
+      className={`slot ${isReserved ? "full" : "empty"}`}
       onClick={handleClick}
       style={{
         cursor: isReserved && !isAdmin ? "not-allowed" : "pointer",
@@ -61,7 +58,7 @@ const TimeSlot = React.memo(({ slot, isReserved, reservedUser, onClick, isAdmin 
       <img
         src={isReserved ? "chairImage.png" : "chairImage-vide.png"}
         alt={isReserved ? "Reserved Chair" : "Available Chair"}
-        className="chair-icon" // Use class names as strings
+        className="chair-icon"
       />
       <span>{slot}</span>
       {isReserved && (
@@ -76,9 +73,8 @@ const TimeSlot = React.memo(({ slot, isReserved, reservedUser, onClick, isAdmin 
   );
 });
 
-// Main Reservation Component
 const Reservation = () => {
-  const { user, setUser, admin, language } = useContext(Context);
+  const { setUser, admin, language } = useContext(Context);
   const [reservations, setReservations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,7 +83,7 @@ const Reservation = () => {
   const isAdmin = Boolean(admin);
   const adminName = admin?.name || location.state?.adminName || "Admin";
 
-  const [currentDate, setCurrentDate] = useState(() =>
+  const [currentDate] = useState(() =>
     location.state?.selectedDate ? new Date(location.state.selectedDate) : new Date()
   );
 
@@ -216,6 +212,10 @@ const Reservation = () => {
 
   if (isLoading) {
     return <div className="reservation-container">{getTranslation("loading", language)}</div>;
+  }
+
+  if (error) {
+    return <div className="reservation-container">Error: {error.message}</div>;
   }
 
   return (

@@ -99,13 +99,14 @@ export const ContextProvider = ({ children }) => {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        if (admin?.token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
-            checkAuth();
-        } else {
-            setIsLoading(false);
-        }
+    if (admin?.token) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${admin.token}`;
+        checkAuth();
+    } else {
+        setIsLoading(false);
+    }
     }, [admin?.token]);
 
     if (isLoading) {

@@ -33,7 +33,6 @@ const SignInForm = () => {
             login: "Login",
             createAccount: "Create an account",
             letsGetStarted: "Let's get you started",
-            // Validation messages
             nameRequired: "Name is required",
             userRequired: "Username is required",
             userLength: "Username must be at least 3 characters",
@@ -56,7 +55,6 @@ const SignInForm = () => {
             login: "Connexion",
             createAccount: "Créer un compte",
             letsGetStarted: "Commençons",
-            // Validation messages
             nameRequired: "Le nom est requis",
             userRequired: "Le nom d'utilisateur est requis",
             userLength: "Le nom d'utilisateur doit contenir au moins 3 caractères",
@@ -79,7 +77,6 @@ const SignInForm = () => {
             login: "تسجيل الدخول",
             createAccount: "إنشاء حساب",
             letsGetStarted: "هيا نبدأ",
-            // Validation messages
             nameRequired: "الاسم مطلوب",
             userRequired: "اسم المستخدم مطلوب",
             userLength: "يجب أن يحتوي اسم المستخدم على 3 أحرف على الأقل",
@@ -98,7 +95,6 @@ const SignInForm = () => {
         const { name, value } = e.target;
         let processedValue = value;
 
-        // For phone, only allow digits
         if (name === 'phone') {
             processedValue = value.replace(/\D/g, '').slice(0, 10);
         }
@@ -108,7 +104,6 @@ const SignInForm = () => {
             [name]: processedValue.trim()
         }));
         
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
                 ...prev,
@@ -155,7 +150,7 @@ const SignInForm = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await axiosInstance.post('/api/users/register', formData);
+            await axiosInstance.post('/api/users/register', formData);
             toast.success(currentTexts.registrationSuccess);
             navigate('/login');
         } catch (err) {

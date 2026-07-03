@@ -1,23 +1,35 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Context } from '../../Context/Context';
-import './AdminPage.css';
+import { Globe } from 'lucide-react';
 import axios from '../../fetch/fetch';
 import AdminAvatarDropdown from "../Admin_AvatarDropdown/AdminAvatarDropdown";
+import "./AdminPage.css";
 
 const AdminPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { admin, setAdmin, language, setLanguagePreference } = useContext(Context); // Add language context
+    const { admin, setAdmin, language, setLanguagePreference } = useContext(Context);
     const adminName = admin?.name || location.state?.adminName || 'Admin';
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
-        // Check if admin data exists in localStorage on component mount
         const storedAdmin = localStorage.getItem('admin');
         if (storedAdmin && !admin) {
             setAdmin(JSON.parse(storedAdmin));
         }
-    }, []);
+
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.language-controls')) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
     const handleLogout = async () => {
         try {
@@ -30,14 +42,12 @@ const AdminPage = () => {
         }
     };
 
-    // Handle language selection
     const handleLanguageClick = async (selectedLanguage) => {
         try {
             await setLanguagePreference(selectedLanguage);
-            alert(`Language set to ${selectedLanguage === 'ar' ? 'Arabic' : selectedLanguage === 'fr' ? 'French' : 'English'}`);
+            setIsDropdownOpen(false);
         } catch (error) {
             console.error('Error setting language:', error);
-            alert('Failed to set language');
         }
     };
 
@@ -51,27 +61,38 @@ const AdminPage = () => {
                          'Welcome'}, {adminName}!
                     </h1>
                 </div>
-
-                {/* Language Selection Buttons */}
-                <div className="language-buttons">
-                    <button
-                        className={`language-button ${language === 'ar' ? 'active' : ''}`}
-                        onClick={() => handleLanguageClick('ar')}
+                <div className="language-controls">
+                    <button 
+                        className="language-btn"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDropdownOpen(!isDropdownOpen);
+                        }}
                     >
-                        Arabe/العربية
+                        <Globe className="language-icon" />
                     </button>
-                    <button
-                        className={`language-button ${language === 'fr' ? 'active' : ''}`}
-                        onClick={() => handleLanguageClick('fr')}
-                    >
-                        Français
-                    </button>
-                    <button
-                        className={`language-button ${language === 'en' ? 'active' : ''}`}
-                        onClick={() => handleLanguageClick('en')}
-                    >
-                        English
-                    </button>
+                    {isDropdownOpen && (
+                        <div className="language-dropdown">
+                            <button
+                                className={`language-option ${language === 'ar' ? 'active' : ''}`}
+                                onClick={() => handleLanguageClick('ar')}
+                            >
+                                العربية
+                            </button>
+                            <button
+                                className={`language-option ${language === 'fr' ? 'active' : ''}`}
+                                onClick={() => handleLanguageClick('fr')}
+                            >
+                                Français
+                            </button>
+                            <button
+                                className={`language-option ${language === 'en' ? 'active' : ''}`}
+                                onClick={() => handleLanguageClick('en')}
+                            >
+                                English
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -88,6 +109,11 @@ const AdminPage = () => {
                          language === 'fr' ? 'Calendrier' : 
                          'Calendar'}
                     </Link>
+                    <button className="logout-button" onClick={handleLogout}>
+                        {language === 'ar' ? 'تسجيل الخروج' : 
+                         language === 'fr' ? 'Déconnexion' : 
+                         'Logout'}
+                    </button>
                 </div>
             </div>
         </div>

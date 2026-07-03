@@ -45,6 +45,8 @@ const Calendar = () => {
       fullDay: "All slots are full for this day. Please select another day. 📅",
       availability: "Error checking availability ❌",
       weekDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      loadError: "Error loading calendar",        // ← كانت "error" مرتين
+      toastError: "Failed to load calendar ❌",   // ← هادي هي التانية
     },
     fr: {
       loading: "Chargement du calendrier...",
@@ -60,6 +62,8 @@ const Calendar = () => {
       fullDay: "Tous les créneaux sont complets pour ce jour. Veuillez sélectionner un autre jour. 📅",
       availability: "Erreur lors de la vérification de la disponibilité ❌",
       weekDays: ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"],
+      loadError: "Erreur de chargement",
+  toastError: "Échec du chargement du calendrier ❌",
     },
     ar: {
       loading: "جاري تحميل التقويم...",
@@ -75,6 +79,8 @@ const Calendar = () => {
       fullDay: "جميع المواعيد محجوزة لهذا اليوم. يرجى اختيار يوم آخر. 📅",
       availability: "خطأ في التحقق من التوفر ❌",
       weekDays: ["إث", "ثل", "أر", "خم", "جم", "سب", "أح"],
+      loadError: "خطأ في التحميل",
+  toastError: "فشل في تحميل التقويم ❌",
     }
   };
 

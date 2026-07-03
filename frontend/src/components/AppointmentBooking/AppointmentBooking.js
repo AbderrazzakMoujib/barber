@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale'; // Import locale directly
+import { fr } from 'date-fns/locale';
 import { Context } from '../../Context/Context';
 import axios from '../../fetch/fetch';
-import { toast } from 'react-toastify'; // Importing toast for notifications
+import { toast } from 'react-toastify';
 import './AppointmentBooking.css';
 import AvatarDropdown from '../AvatarDropdown/AvatarDropdown';
 
@@ -13,9 +13,8 @@ const AppointmentBooking = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract slot and selectedDate from location state
-  const { slot, selectedDate: navigationDate } = location.state || {};
-  const [selectedDate, setSelectedDate] = useState(() => {
+  const { slot } = location.state || {};
+  const [selectedDate] = useState(() => {
     if (location.state?.selectedDate) {
       return new Date(location.state.selectedDate);
     }
@@ -26,7 +25,6 @@ const AppointmentBooking = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch user data if not already available
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -49,7 +47,6 @@ const AppointmentBooking = () => {
     fetchUser();
   }, [user, setUser, language]);
 
-  // Handle reservation submission
   const handleReservation = async () => {
     if (!slot) {
       setError(
@@ -84,9 +81,8 @@ const AppointmentBooking = () => {
         userId: user.id || user._id,
       };
 
-      const response = await axios.post('/api/reservations', reservationData);
+      await axios.post('/api/reservations', reservationData);
 
-      // Show success toast notification
       toast.success(
         language === 'ar'
           ? `تم تأكيد الحجز لـ ${slot} في ${format(selectedDate, 'dd/MM/yyyy', { locale: fr })}`
@@ -100,7 +96,6 @@ const AppointmentBooking = () => {
         }
       );
 
-      // Navigate to the reservation confirmation page
       navigate('/reservation', {
         state: {
           selectedDate: format(selectedDate, 'yyyy-MM-dd'),
@@ -119,7 +114,6 @@ const AppointmentBooking = () => {
 
       setError(errorMessage);
 
-      // Show error toast notification
       toast.error(errorMessage, {
         position: 'top-right',
         autoClose: 3000,
@@ -222,14 +216,14 @@ const AppointmentBooking = () => {
             {language === 'ar'
               ? 'يرجى الحضور في الوقت المحدد والتحقق من الرسائل للتأكيد.'
               : language === 'fr'
-              ? 'Veuillez être à l\'heure et vérifier vos messages pour la confirmation.'
+              ? "Veuillez être à l'heure et vérifier vos messages pour la confirmation."
               : 'Please be on time and check your messages for confirmation.'}
           </p>
           <span>
             {language === 'ar'
               ? 'يجب إلغاء أو تعديل الحجز قبل 15 دقيقة على الأقل من الوقت المحدد!'
               : language === 'fr'
-              ? 'Vous devez annuler ou modifier votre rendez-vous au moins 15 minutes avant l\'heure prévue!'
+              ? "Vous devez annuler ou modifier votre rendez-vous au moins 15 minutes avant l'heure prévue!"
               : 'You must cancel or modify your appointment at least 15 minutes before the scheduled time!'}
           </span>
         </div>
